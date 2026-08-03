@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 
@@ -147,6 +146,17 @@ namespace PirexZenith.Core
             }
 
             var type = descriptor.ImplementationType;
+
+            if (PirexZenithAOTCache.TryGetFactory(type, out var aotFactory))
+            {
+                return () =>
+                {
+                    var obj = aotFactory(this);
+                    if (InjectorCache.RequiresInjection(obj.GetType())) Inject(obj);
+                    return obj;
+                };
+            }
+
             var cachedCtor = AnalyzeConstructor(type);
 
             if (cachedCtor.IsDefaultConstructor)
@@ -198,12 +208,21 @@ namespace PirexZenith.Core
             return compiledFunc;
         }
 
-        public IEnumerable<T> ResolveAll<T>()
+        public List<T> ResolveAll<T>()
         {
-            return ResolveAll(typeof(T)).Cast<T>();
+            var raw = ResolveAll(typeof(T));
+            var result = new List<T>(raw.Count);
+            for (int i = 0; i < raw.Count; i++)
+            {
+                if (raw[i] is T item)
+                {
+                    result.Add(item);
+                }
+            }
+            return result;
         }
 
-        public IEnumerable<object> ResolveAll(Type type)
+        public List<object> ResolveAll(Type type)
         {
             if (_disposed) throw new ObjectDisposedException(nameof(DIContainer));
 
@@ -213,7 +232,10 @@ namespace PirexZenith.Core
             {
                 if (_bindings.TryGetValue(type, out var list))
                 {
-                    results.AddRange(list.Select(ResolveDescriptor));
+                    for (int i = 0; i < list.Count; i++)
+                    {
+                        results.Add(ResolveDescriptor(list[i]));
+                    }
                 }
             }
 
@@ -304,6 +326,11 @@ namespace PirexZenith.Core
 
         private object CreateInstance(Type type)
         {
+            if (PirexZenithAOTCache.TryGetFactory(type, out var aotFactory))
+            {
+                return aotFactory(this);
+            }
+
             CachedConstructorInfo cached;
             lock (_constructorCache)
             {

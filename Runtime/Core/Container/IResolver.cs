@@ -31,12 +31,12 @@ namespace PirexZenith.Core
         /// <summary>
         /// Resolves all service instances registered for type T.
         /// </summary>
-        IEnumerable<T> ResolveAll<T>();
+        List<T> ResolveAll<T>();
 
         /// <summary>
         /// Resolves all service instances registered for the specified runtime Type.
         /// </summary>
-        IEnumerable<object> ResolveAll(Type type);
+        List<object> ResolveAll(Type type);
 
         /// <summary>
         /// Performs dependency injection on an existing target instance.
