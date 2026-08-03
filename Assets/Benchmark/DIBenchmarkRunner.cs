@@ -28,6 +28,20 @@ namespace PirexZenith.Editor.Benchmark
         public readonly BenchServiceB B;
         public BenchServiceC(BenchServiceB b) { B = b; }
     }
+    public class BenchServiceD
+    {
+        public readonly BenchServiceC C;
+        public BenchServiceD(BenchServiceC c) { C = c; }
+    }
+    public class BenchServiceE
+    {
+        public readonly BenchServiceD D;
+        public BenchServiceE(BenchServiceD d) { D = d; }
+    }
+    public interface IBenchMultiService { void Work(); }
+    public class BenchMulti1 : IBenchMultiService { public void Work() { } }
+    public class BenchMulti2 : IBenchMultiService { public void Work() { } }
+    public class BenchMulti3 : IBenchMultiService { public void Work() { } }
     public class BenchDummyService { }
 
     public class BenchMonoBehaviour : MonoBehaviour
@@ -49,10 +63,13 @@ namespace PirexZenith.Editor.Benchmark
             public string TestName;
             public double PirexMs;
             public long PirexGc;
+            public int PirexGen0;
             public double VContainerMs;
             public long VContainerGc;
+            public int VContainerGen0;
             public double ReflexMs;
             public long ReflexGc;
+            public int ReflexGen0;
         }
 
         private List<BenchResult> _results = new List<BenchResult>();
@@ -63,7 +80,7 @@ namespace PirexZenith.Editor.Benchmark
         public static void ShowWindow()
         {
             var win = GetWindow<DIBenchmarkRunner>("DI 3-Way Benchmark");
-            win.minSize = new Vector2(650, 420);
+            win.minSize = new Vector2(760, 420);
             win.Show();
         }
 
@@ -126,20 +143,20 @@ namespace PirexZenith.Editor.Benchmark
         private void DrawResultHeader()
         {
             EditorGUILayout.BeginHorizontal("box");
-            GUILayout.Label("Test Name", EditorStyles.boldLabel, GUILayout.Width(200));
-            GUILayout.Label("👑 PirexZenith", EditorStyles.boldLabel, GUILayout.Width(130));
-            GUILayout.Label("VContainer", EditorStyles.boldLabel, GUILayout.Width(130));
-            GUILayout.Label("Reflex", EditorStyles.boldLabel, GUILayout.Width(130));
+            GUILayout.Label("Test Name", EditorStyles.boldLabel, GUILayout.Width(190));
+            GUILayout.Label("👑 PirexZenith", EditorStyles.boldLabel, GUILayout.Width(175));
+            GUILayout.Label("VContainer", EditorStyles.boldLabel, GUILayout.Width(175));
+            GUILayout.Label("Reflex", EditorStyles.boldLabel, GUILayout.Width(175));
             EditorGUILayout.EndHorizontal();
         }
 
         private void DrawResultRow(BenchResult res)
         {
             EditorGUILayout.BeginHorizontal("box");
-            GUILayout.Label(res.TestName, GUILayout.Width(200));
-            GUILayout.Label($"{res.PirexMs:F2} ms ({FormatMemory(res.PirexGc)})", EditorStyles.boldLabel, GUILayout.Width(130));
-            GUILayout.Label($"{res.VContainerMs:F2} ms ({FormatMemory(res.VContainerGc)})", GUILayout.Width(130));
-            GUILayout.Label($"{res.ReflexMs:F2} ms ({FormatMemory(res.ReflexGc)})", GUILayout.Width(130));
+            GUILayout.Label(res.TestName, GUILayout.Width(190));
+            GUILayout.Label($"{res.PirexMs:F2}ms | {FormatMemory(res.PirexGc)} | G0:{res.PirexGen0}", EditorStyles.boldLabel, GUILayout.Width(175));
+            GUILayout.Label($"{res.VContainerMs:F2}ms | {FormatMemory(res.VContainerGc)} | G0:{res.VContainerGen0}", GUILayout.Width(175));
+            GUILayout.Label($"{res.ReflexMs:F2}ms | {FormatMemory(res.ReflexGc)} | G0:{res.ReflexGen0}", GUILayout.Width(175));
             EditorGUILayout.EndHorizontal();
         }
 
@@ -181,7 +198,7 @@ namespace PirexZenith.Editor.Benchmark
                 var builder = new PirexZenith.Core.ContainerBuilder();
                 for (int i = 0; i < 50; i++) builder.RegisterTransient<BenchDummyService>();
                 builder.Build();
-            }, out res.PirexMs, out res.PirexGc);
+            }, out res.PirexMs, out res.PirexGc, out res.PirexGen0);
 
             // VContainer
 #if PIREX_VCONTAINER_ENABLED
@@ -190,7 +207,7 @@ namespace PirexZenith.Editor.Benchmark
                 var builder = new VContainer.ContainerBuilder();
                 for (int i = 0; i < 50; i++) builder.Register<BenchDummyService>(VContainer.Lifetime.Transient);
                 builder.Build();
-            }, out res.VContainerMs, out res.VContainerGc);
+            }, out res.VContainerMs, out res.VContainerGc, out res.VContainerGen0);
 #endif
 
             // Reflex
@@ -200,7 +217,7 @@ namespace PirexZenith.Editor.Benchmark
                 var builder = new Reflex.Core.ContainerBuilder();
                 for (int i = 0; i < 50; i++) builder.RegisterType(typeof(BenchDummyService), Reflex.Enums.Lifetime.Transient, Reflex.Enums.Resolution.Lazy);
                 builder.Build();
-            }, out res.ReflexMs, out res.ReflexGc);
+            }, out res.ReflexMs, out res.ReflexGc, out res.ReflexGen0);
 #endif
 
             return res;
@@ -222,7 +239,7 @@ namespace PirexZenith.Editor.Benchmark
                 Measure(() =>
                 {
                     for (int i = 0; i < 10000; i++) container.Resolve<BenchServiceC>();
-                }, out res.PirexMs, out res.PirexGc);
+                }, out res.PirexMs, out res.PirexGc, out res.PirexGen0);
             }
 
             // VContainer
@@ -238,7 +255,7 @@ namespace PirexZenith.Editor.Benchmark
                 Measure(() =>
                 {
                     for (int i = 0; i < 10000; i++) container.Resolve<BenchServiceC>();
-                }, out res.VContainerMs, out res.VContainerGc);
+                }, out res.VContainerMs, out res.VContainerGc, out res.VContainerGen0);
             }
 #endif
 
@@ -255,7 +272,7 @@ namespace PirexZenith.Editor.Benchmark
                 Measure(() =>
                 {
                     for (int i = 0; i < 10000; i++) container.Resolve<BenchServiceC>();
-                }, out res.ReflexMs, out res.ReflexGc);
+                }, out res.ReflexMs, out res.ReflexGc, out res.ReflexGen0);
             }
 #endif
 
@@ -276,7 +293,7 @@ namespace PirexZenith.Editor.Benchmark
                 Measure(() =>
                 {
                     for (int i = 0; i < 10000; i++) container.Resolve<IBenchSingleton>();
-                }, out res.PirexMs, out res.PirexGc);
+                }, out res.PirexMs, out res.PirexGc, out res.PirexGen0);
             }
 
             // VContainer
@@ -290,7 +307,7 @@ namespace PirexZenith.Editor.Benchmark
                 Measure(() =>
                 {
                     for (int i = 0; i < 10000; i++) container.Resolve<IBenchSingleton>();
-                }, out res.VContainerMs, out res.VContainerGc);
+                }, out res.VContainerMs, out res.VContainerGc, out res.VContainerGen0);
             }
 #endif
 
@@ -305,7 +322,7 @@ namespace PirexZenith.Editor.Benchmark
                 Measure(() =>
                 {
                     for (int i = 0; i < 10000; i++) container.Resolve<IBenchSingleton>();
-                }, out res.ReflexMs, out res.ReflexGc);
+                }, out res.ReflexMs, out res.ReflexGc, out res.ReflexGen0);
             }
 #endif
 
@@ -339,7 +356,7 @@ namespace PirexZenith.Editor.Benchmark
                         var go = UnityContainerExtensions.Instantiate(container, prefab);
                         created.Add(go);
                     }
-                }, out res.PirexMs, out res.PirexGc);
+                }, out res.PirexMs, out res.PirexGc, out res.PirexGen0);
 
                 foreach (var go in created) DestroyImmediate(go);
                 created.Clear();
@@ -364,7 +381,7 @@ namespace PirexZenith.Editor.Benchmark
                         resolver.InjectGameObject(go);
                         created.Add(go);
                     }
-                }, out res.VContainerMs, out res.VContainerGc);
+                }, out res.VContainerMs, out res.VContainerGc, out res.VContainerGen0);
 
                 foreach (var go in created) DestroyImmediate(go);
                 created.Clear();
@@ -389,7 +406,7 @@ namespace PirexZenith.Editor.Benchmark
                         Reflex.Injectors.AttributeInjector.Inject(go.GetComponent<BenchMonoBehaviour>(), container);
                         created.Add(go);
                     }
-                }, out res.ReflexMs, out res.ReflexGc);
+                }, out res.ReflexMs, out res.ReflexGc, out res.ReflexGen0);
 
                 foreach (var go in created) DestroyImmediate(go);
                 created.Clear();
@@ -400,22 +417,25 @@ namespace PirexZenith.Editor.Benchmark
             return res;
         }
 
-        private void Measure(Action action, out double ms, out long gcAlloc)
+        private void Measure(Action action, out double ms, out long gcAlloc, out int gen0Collections)
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
             GC.Collect();
 
             long startMem = GC.GetAllocatedBytesForCurrentThread();
+            int startGen0 = GC.CollectionCount(0);
             Stopwatch sw = Stopwatch.StartNew();
 
             action();
 
             sw.Stop();
+            int endGen0 = GC.CollectionCount(0);
             long endMem = GC.GetAllocatedBytesForCurrentThread();
 
             ms = sw.Elapsed.TotalMilliseconds;
             gcAlloc = Math.Max(0, endMem - startMem);
+            gen0Collections = Math.Max(0, endGen0 - startGen0);
         }
 
         private void LogMarkdownTable()
@@ -423,16 +443,16 @@ namespace PirexZenith.Editor.Benchmark
             StringBuilder sb = new StringBuilder();
             sb.AppendLine("### 🏁 3-Way DI Performance Benchmark Results (PirexZenith vs VContainer vs Reflex)");
             sb.AppendLine();
-            sb.AppendLine("| Test Name | 👑 PirexZenith (ms / GC) | VContainer (ms / GC) | Reflex (ms / GC) |");
+            sb.AppendLine("| Test Name | 👑 PirexZenith (ms / GC / Gen0) | VContainer (ms / GC / Gen0) | Reflex (ms / GC / Gen0) |");
             sb.AppendLine("| :--- | :---: | :---: | :---: |");
 
             foreach (var res in _results)
             {
-                sb.AppendLine($"| **{res.TestName}** | **{res.PirexMs:F2} ms** ({FormatMemory(res.PirexGc)}) | {res.VContainerMs:F2} ms ({FormatMemory(res.VContainerGc)}) | {res.ReflexMs:F2} ms ({FormatMemory(res.ReflexGc)}) |");
+                sb.AppendLine($"| **{res.TestName}** | **{res.PirexMs:F2} ms** ({FormatMemory(res.PirexGc)} - Gen0: {res.PirexGen0}) | {res.VContainerMs:F2} ms ({FormatMemory(res.VContainerGc)} - Gen0: {res.VContainerGen0}) | {res.ReflexMs:F2} ms ({FormatMemory(res.ReflexGc)} - Gen0: {res.ReflexGen0}) |");
             }
 
             sb.AppendLine();
-            sb.AppendLine("*Benchmark executed via `DIBenchmarkRunner` in Unity Editor.*");
+            sb.AppendLine("*Benchmark executed via `DIBenchmarkRunner` in Unity Editor measuring execution time (ms), GC Allocations (Bytes), and GC Gen 0 collections.*");
             Debug.Log(sb.ToString());
         }
     }

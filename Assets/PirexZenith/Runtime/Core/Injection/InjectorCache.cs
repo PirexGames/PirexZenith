@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq.Expressions;
 
 namespace PirexZenith.Core
 {
@@ -53,84 +54,99 @@ namespace PirexZenith.Core
                     return cached;
                 }
 
-                var injector = BuildReflectionInjector(type);
+                var injector = BuildExpressionInjector(type);
                 _injectors[type] = injector;
                 return injector;
             }
         }
 
-        private static Action<IResolver, object> BuildReflectionInjector(Type type)
+        private static Action<IResolver, object> BuildExpressionInjector(Type type)
         {
-            var fieldInjectors = new List<Action<IResolver, object>>();
-            var propertyInjectors = new List<Action<IResolver, object>>();
-            var methodInjectors = new List<Action<IResolver, object>>();
+            var expressions = new List<Expression>();
+            var resolverParam = Expression.Parameter(typeof(IResolver), "resolver");
+            var targetParam = Expression.Parameter(typeof(object), "target");
+            var typedTarget = Expression.Variable(type, "typedTarget");
+
+            expressions.Add(Expression.Assign(typedTarget, Expression.Convert(targetParam, type)));
+
+            var resolveMethod = typeof(IResolver).GetMethod(nameof(IResolver.Resolve), new[] { typeof(Type) });
+            int injectionCount = 0;
 
             Type currentType = type;
             while (currentType != null && currentType != typeof(object))
             {
                 var flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly;
 
-                // 1. Fields
+                // 1. Fields (Zero-boxing compiled field assignment)
                 foreach (var field in currentType.GetFields(flags))
                 {
                     if (Attribute.IsDefined(field, typeof(InjectAttribute)))
                     {
-                        var fieldInfo = field;
-                        fieldInjectors.Add((resolver, obj) =>
+                        var callResolve = Expression.Call(resolverParam, resolveMethod, Expression.Constant(field.FieldType));
+                        var convertedVal = Expression.Convert(callResolve, field.FieldType);
+
+                        if (field.IsInitOnly)
                         {
-                            var val = resolver.Resolve(fieldInfo.FieldType);
-                            fieldInfo.SetValue(obj, val);
-                        });
+                            var fieldInfo = field;
+                            expressions.Add(Expression.Call(
+                                Expression.Constant(fieldInfo),
+                                typeof(FieldInfo).GetMethod(nameof(FieldInfo.SetValue), new[] { typeof(object), typeof(object) }),
+                                targetParam,
+                                Expression.Convert(convertedVal, typeof(object))
+                            ));
+                        }
+                        else
+                        {
+                            expressions.Add(Expression.Assign(Expression.Field(typedTarget, field), convertedVal));
+                        }
+                        injectionCount++;
                     }
                 }
 
-                // 2. Properties
+                // 2. Properties (Zero-boxing compiled property setter invocation)
                 foreach (var prop in currentType.GetProperties(flags))
                 {
                     if (Attribute.IsDefined(prop, typeof(InjectAttribute)) && prop.CanWrite)
                     {
-                        var propInfo = prop;
-                        propertyInjectors.Add((resolver, obj) =>
+                        var setter = prop.GetSetMethod(true);
+                        if (setter != null)
                         {
-                            var val = resolver.Resolve(propInfo.PropertyType);
-                            propInfo.SetValue(obj, val);
-                        });
+                            var callResolve = Expression.Call(resolverParam, resolveMethod, Expression.Constant(prop.PropertyType));
+                            var convertedVal = Expression.Convert(callResolve, prop.PropertyType);
+                            expressions.Add(Expression.Call(typedTarget, setter, convertedVal));
+                            injectionCount++;
+                        }
                     }
                 }
 
-                // 3. Methods
+                // 3. Methods (Zero-array-allocation compiled method invocation)
                 foreach (var method in currentType.GetMethods(flags))
                 {
                     if (Attribute.IsDefined(method, typeof(InjectAttribute)))
                     {
-                        var methodInfo = method;
-                        var paramInfos = methodInfo.GetParameters();
-                        methodInjectors.Add((resolver, obj) =>
+                        var paramInfos = method.GetParameters();
+                        var argExprs = new Expression[paramInfos.Length];
+                        for (int i = 0; i < paramInfos.Length; i++)
                         {
-                            var args = new object[paramInfos.Length];
-                            for (int i = 0; i < paramInfos.Length; i++)
-                            {
-                                args[i] = resolver.Resolve(paramInfos[i].ParameterType);
-                            }
-                            methodInfo.Invoke(obj, args);
-                        });
+                            var callResolve = Expression.Call(resolverParam, resolveMethod, Expression.Constant(paramInfos[i].ParameterType));
+                            argExprs[i] = Expression.Convert(callResolve, paramInfos[i].ParameterType);
+                        }
+                        expressions.Add(Expression.Call(typedTarget, method, argExprs));
+                        injectionCount++;
                     }
                 }
 
                 currentType = currentType.BaseType;
             }
 
-            if (fieldInjectors.Count == 0 && propertyInjectors.Count == 0 && methodInjectors.Count == 0)
+            if (injectionCount == 0)
             {
                 return null;
             }
 
-            return (resolver, obj) =>
-            {
-                for (int i = 0; i < fieldInjectors.Count; i++) fieldInjectors[i](resolver, obj);
-                for (int i = 0; i < propertyInjectors.Count; i++) propertyInjectors[i](resolver, obj);
-                for (int i = 0; i < methodInjectors.Count; i++) methodInjectors[i](resolver, obj);
-            };
+            var block = Expression.Block(new[] { typedTarget }, expressions);
+            var lambda = Expression.Lambda<Action<IResolver, object>>(block, resolverParam, targetParam);
+            return lambda.Compile();
         }
 
         /// <summary>

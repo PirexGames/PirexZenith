@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using PirexZenith.Core;
 using PirexZenith.Core.Lifecycle;
 using UnityEngine;
@@ -120,11 +119,11 @@ namespace PirexZenith.Unity
         {
             if (Container == null) return;
 
-            _initializables = Container.ResolveAll<IInitializable>().ToList();
-            _tickables = Container.ResolveAll<ITickable>().ToList();
-            _fixedTickables = Container.ResolveAll<IFixedTickable>().ToList();
-            _lateTickables = Container.ResolveAll<ILateTickable>().ToList();
-            _disposables = Container.ResolveAll<IDisposable>().ToList();
+            _initializables = Container.ResolveAll<IInitializable>();
+            _tickables = Container.ResolveAll<ITickable>();
+            _fixedTickables = Container.ResolveAll<IFixedTickable>();
+            _lateTickables = Container.ResolveAll<ILateTickable>();
+            _disposables = Container.ResolveAll<IDisposable>();
 
             if (_initializables != null && _initializables.Count > 0)
             {
