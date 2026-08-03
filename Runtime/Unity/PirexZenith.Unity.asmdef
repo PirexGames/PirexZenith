@@ -1,0 +1,23 @@
+{
+    "name": "PirexZenith.Unity",
+    "rootNamespace": "PirexZenith.Unity",
+    "references": [
+        "PirexZenith.Core",
+        "PirexGames.RexPool"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.pirexgames.rexpool",
+            "expression": "",
+            "define": "PIREX_REXPOOL_ENABLED"
+        }
+    ],
+    "noEngineReferences": false
+}
