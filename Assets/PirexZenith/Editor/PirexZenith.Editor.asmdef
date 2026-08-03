@@ -1,0 +1,19 @@
+{
+    "name": "PirexZenith.Editor",
+    "rootNamespace": "PirexZenith.Editor",
+    "references": [
+        "PirexZenith.Core",
+        "PirexZenith.Unity"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

@@ -1,0 +1,21 @@
+{
+  "name": "com.pirexgames.pirexzenith",
+  "version": "1.0.0",
+  "displayName": "PirexZenith",
+  "description": "PirexZenith - The Peak of Fast & Convenient Unity Dependency Injection by PirexGames. Zero-Config Scene Injection, Auto-Baking Architecture, and Bulletproof Fallback.",
+  "unity": "2021.3",
+  "unityRelease": "0f1",
+  "keywords": [
+    "unity",
+    "dependency-injection",
+    "di",
+    "ioc",
+    "pirexzenith",
+    "pirexgames",
+    "performance"
+  ],
+  "author": {
+    "name": "PirexGames",
+    "email": "support@pirexgames.com"
+  }
+}

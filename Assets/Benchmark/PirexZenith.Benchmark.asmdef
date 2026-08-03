@@ -1,0 +1,33 @@
+{
+    "name": "PirexZenith.Benchmark",
+    "rootNamespace": "PirexZenith.Editor.Benchmark",
+    "references": [
+        "PirexZenith.Core",
+        "PirexZenith.Unity",
+        "PirexZenith.Editor",
+        "VContainer",
+        "Reflex"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "jp.hadashikick.vcontainer",
+            "expression": "",
+            "define": "PIREX_VCONTAINER_ENABLED"
+        },
+        {
+            "name": "com.gustavopsantos.reflex",
+            "expression": "",
+            "define": "PIREX_REFLEX_ENABLED"
+        }
+    ],
+    "noEngineReferences": false
+}

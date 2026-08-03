@@ -1,0 +1,439 @@
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Text;
+using PirexZenith.Core;
+using PirexZenith.Unity;
+using UnityEditor;
+using UnityEngine;
+using Debug = UnityEngine.Debug;
+#if PIREX_VCONTAINER_ENABLED
+using VContainer;
+using VContainer.Unity;
+#endif
+
+namespace PirexZenith.Editor.Benchmark
+{
+    public interface IBenchSingleton { void DoWork(); }
+    public class BenchSingleton : IBenchSingleton { public void DoWork() { } }
+
+    public class BenchServiceA { }
+    public class BenchServiceB
+    {
+        public readonly BenchServiceA A;
+        public BenchServiceB(BenchServiceA a) { A = a; }
+    }
+    public class BenchServiceC
+    {
+        public readonly BenchServiceB B;
+        public BenchServiceC(BenchServiceB b) { B = b; }
+    }
+    public class BenchDummyService { }
+
+    public class BenchMonoBehaviour : MonoBehaviour
+    {
+        [PirexZenith.Core.Inject]
+#if PIREX_VCONTAINER_ENABLED
+        [VContainer.Inject]
+#endif
+#if PIREX_REFLEX_ENABLED
+        [Reflex.Attributes.Inject]
+#endif
+        public BenchServiceA A { get; private set; }
+    }
+
+    public class DIBenchmarkRunner : EditorWindow
+    {
+        private struct BenchResult
+        {
+            public string TestName;
+            public double PirexMs;
+            public long PirexGc;
+            public double VContainerMs;
+            public long VContainerGc;
+            public double ReflexMs;
+            public long ReflexGc;
+        }
+
+        private List<BenchResult> _results = new List<BenchResult>();
+        private Vector2 _scrollPos;
+        private bool _isRunning = false;
+
+        [MenuItem("Tools/PirexZenith/🏁 Run 3-Way DI Benchmark")]
+        public static void ShowWindow()
+        {
+            var win = GetWindow<DIBenchmarkRunner>("DI 3-Way Benchmark");
+            win.minSize = new Vector2(650, 420);
+            win.Show();
+        }
+
+        private void OnGUI()
+        {
+            GUILayout.Space(10);
+            GUILayout.Label("🏁 PirexZenith vs. VContainer vs. Reflex Performance Benchmark", EditorStyles.boldLabel);
+            GUILayout.Label("Scientific comparison measuring Execution Time (ms) & GC Allocation (Bytes).", EditorStyles.miniLabel);
+            GUILayout.Space(10);
+
+            EditorGUILayout.BeginHorizontal(EditorStyles.helpBox);
+            GUILayout.Label("Libraries Status:", EditorStyles.boldLabel, GUILayout.Width(120));
+            GUILayout.Label("👑 PirexZenith: Ready (O(1) Pre-baked)");
+
+#if PIREX_VCONTAINER_ENABLED
+            GUILayout.Label("VContainer: Installed", EditorStyles.boldLabel);
+#else
+            GUILayout.Label("VContainer: Not Installed", EditorStyles.miniLabel);
+#endif
+
+#if PIREX_REFLEX_ENABLED
+            GUILayout.Label("Reflex: Installed", EditorStyles.boldLabel);
+#else
+            GUILayout.Label("Reflex: Not Installed", EditorStyles.miniLabel);
+#endif
+            EditorGUILayout.EndHorizontal();
+
+            GUILayout.Space(15);
+
+            GUI.enabled = !_isRunning;
+            if (GUILayout.Button("▶ RUN FULL BENCHMARK SUITE (4 TESTS)", GUILayout.Height(35)))
+            {
+                RunBenchmarks();
+            }
+            GUI.enabled = true;
+
+            GUILayout.Space(15);
+
+            if (_results.Count > 0)
+            {
+                GUILayout.Label("📊 Benchmark Results Summary:", EditorStyles.boldLabel);
+                _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
+
+                DrawResultHeader();
+                foreach (var res in _results)
+                {
+                    DrawResultRow(res);
+                }
+
+                EditorGUILayout.EndScrollView();
+
+                GUILayout.Space(10);
+                if (GUILayout.Button("📋 Log Markdown Comparison Table to Console"))
+                {
+                    LogMarkdownTable();
+                }
+            }
+        }
+
+        private void DrawResultHeader()
+        {
+            EditorGUILayout.BeginHorizontal("box");
+            GUILayout.Label("Test Name", EditorStyles.boldLabel, GUILayout.Width(200));
+            GUILayout.Label("👑 PirexZenith", EditorStyles.boldLabel, GUILayout.Width(130));
+            GUILayout.Label("VContainer", EditorStyles.boldLabel, GUILayout.Width(130));
+            GUILayout.Label("Reflex", EditorStyles.boldLabel, GUILayout.Width(130));
+            EditorGUILayout.EndHorizontal();
+        }
+
+        private void DrawResultRow(BenchResult res)
+        {
+            EditorGUILayout.BeginHorizontal("box");
+            GUILayout.Label(res.TestName, GUILayout.Width(200));
+            GUILayout.Label($"{res.PirexMs:F2} ms ({FormatMemory(res.PirexGc)})", EditorStyles.boldLabel, GUILayout.Width(130));
+            GUILayout.Label($"{res.VContainerMs:F2} ms ({FormatMemory(res.VContainerGc)})", GUILayout.Width(130));
+            GUILayout.Label($"{res.ReflexMs:F2} ms ({FormatMemory(res.ReflexGc)})", GUILayout.Width(130));
+            EditorGUILayout.EndHorizontal();
+        }
+
+        private string FormatMemory(long bytes)
+        {
+            if (bytes < 1024) return $"{bytes} B";
+            if (bytes < 1024 * 1024) return $"{bytes / 1024.0:F1} KB";
+            return $"{bytes / (1024.0 * 1024.0):F2} MB";
+        }
+
+        private void RunBenchmarks()
+        {
+            _isRunning = true;
+            _results.Clear();
+
+            try
+            {
+                _results.Add(RunTest1_ContainerBuild());
+                _results.Add(RunTest2_TransientResolve());
+                _results.Add(RunTest3_SingletonResolve());
+                _results.Add(RunTest4_GameObjectInjection());
+
+                LogMarkdownTable();
+            }
+            finally
+            {
+                _isRunning = false;
+                Repaint();
+            }
+        }
+
+        private BenchResult RunTest1_ContainerBuild()
+        {
+            var res = new BenchResult { TestName = "1. Container Build (50 Svc)" };
+
+            // 👑 PirexZenith
+            Measure(() =>
+            {
+                var builder = new PirexZenith.Core.ContainerBuilder();
+                for (int i = 0; i < 50; i++) builder.RegisterTransient<BenchDummyService>();
+                builder.Build();
+            }, out res.PirexMs, out res.PirexGc);
+
+            // VContainer
+#if PIREX_VCONTAINER_ENABLED
+            Measure(() =>
+            {
+                var builder = new VContainer.ContainerBuilder();
+                for (int i = 0; i < 50; i++) builder.Register<BenchDummyService>(VContainer.Lifetime.Transient);
+                builder.Build();
+            }, out res.VContainerMs, out res.VContainerGc);
+#endif
+
+            // Reflex
+#if PIREX_REFLEX_ENABLED
+            Measure(() =>
+            {
+                var builder = new Reflex.Core.ContainerBuilder();
+                for (int i = 0; i < 50; i++) builder.RegisterType(typeof(BenchDummyService), Reflex.Enums.Lifetime.Transient, Reflex.Enums.Resolution.Lazy);
+                builder.Build();
+            }, out res.ReflexMs, out res.ReflexGc);
+#endif
+
+            return res;
+        }
+
+        private BenchResult RunTest2_TransientResolve()
+        {
+            var res = new BenchResult { TestName = "2. 10,000x Transient Resolve" };
+
+            // 👑 PirexZenith
+            {
+                var builder = new PirexZenith.Core.ContainerBuilder();
+                builder.RegisterTransient<BenchServiceA>();
+                builder.RegisterTransient<BenchServiceB>();
+                builder.RegisterTransient<BenchServiceC>();
+                var container = builder.Build();
+                container.Resolve<BenchServiceC>(); // Warmup
+
+                Measure(() =>
+                {
+                    for (int i = 0; i < 10000; i++) container.Resolve<BenchServiceC>();
+                }, out res.PirexMs, out res.PirexGc);
+            }
+
+            // VContainer
+#if PIREX_VCONTAINER_ENABLED
+            {
+                var builder = new VContainer.ContainerBuilder();
+                builder.Register<BenchServiceA>(VContainer.Lifetime.Transient);
+                builder.Register<BenchServiceB>(VContainer.Lifetime.Transient);
+                builder.Register<BenchServiceC>(VContainer.Lifetime.Transient);
+                var container = builder.Build();
+                container.Resolve<BenchServiceC>(); // Warmup
+
+                Measure(() =>
+                {
+                    for (int i = 0; i < 10000; i++) container.Resolve<BenchServiceC>();
+                }, out res.VContainerMs, out res.VContainerGc);
+            }
+#endif
+
+            // Reflex
+#if PIREX_REFLEX_ENABLED
+            {
+                var builder = new Reflex.Core.ContainerBuilder();
+                builder.RegisterType(typeof(BenchServiceA), Reflex.Enums.Lifetime.Transient, Reflex.Enums.Resolution.Lazy);
+                builder.RegisterType(typeof(BenchServiceB), Reflex.Enums.Lifetime.Transient, Reflex.Enums.Resolution.Lazy);
+                builder.RegisterType(typeof(BenchServiceC), Reflex.Enums.Lifetime.Transient, Reflex.Enums.Resolution.Lazy);
+                var container = builder.Build();
+                container.Resolve<BenchServiceC>(); // Warmup
+
+                Measure(() =>
+                {
+                    for (int i = 0; i < 10000; i++) container.Resolve<BenchServiceC>();
+                }, out res.ReflexMs, out res.ReflexGc);
+            }
+#endif
+
+            return res;
+        }
+
+        private BenchResult RunTest3_SingletonResolve()
+        {
+            var res = new BenchResult { TestName = "3. 10,000x Singleton Resolve" };
+
+            // 👑 PirexZenith
+            {
+                var builder = new PirexZenith.Core.ContainerBuilder();
+                builder.RegisterSingleton<BenchSingleton, IBenchSingleton>();
+                var container = builder.Build();
+                container.Resolve<IBenchSingleton>(); // Warmup
+
+                Measure(() =>
+                {
+                    for (int i = 0; i < 10000; i++) container.Resolve<IBenchSingleton>();
+                }, out res.PirexMs, out res.PirexGc);
+            }
+
+            // VContainer
+#if PIREX_VCONTAINER_ENABLED
+            {
+                var builder = new VContainer.ContainerBuilder();
+                builder.Register<BenchSingleton>(VContainer.Lifetime.Singleton).As<IBenchSingleton>();
+                var container = builder.Build();
+                container.Resolve<IBenchSingleton>(); // Warmup
+
+                Measure(() =>
+                {
+                    for (int i = 0; i < 10000; i++) container.Resolve<IBenchSingleton>();
+                }, out res.VContainerMs, out res.VContainerGc);
+            }
+#endif
+
+            // Reflex
+#if PIREX_REFLEX_ENABLED
+            {
+                var builder = new Reflex.Core.ContainerBuilder();
+                builder.RegisterType(typeof(BenchSingleton), new[] { typeof(IBenchSingleton) }, Reflex.Enums.Lifetime.Singleton, Reflex.Enums.Resolution.Lazy);
+                var container = builder.Build();
+                container.Resolve<IBenchSingleton>(); // Warmup
+
+                Measure(() =>
+                {
+                    for (int i = 0; i < 10000; i++) container.Resolve<IBenchSingleton>();
+                }, out res.ReflexMs, out res.ReflexGc);
+            }
+#endif
+
+            return res;
+        }
+
+        private BenchResult RunTest4_GameObjectInjection()
+        {
+            var res = new BenchResult { TestName = "4. 1,000x GameObject DI Inject" };
+
+            GameObject prefab = new GameObject("BenchPrefab");
+            prefab.AddComponent<BenchMonoBehaviour>();
+            var cache = prefab.AddComponent<DIPrefabCache>();
+            cache.SetCachedTargets(new List<UnityEngine.MonoBehaviour> { prefab.GetComponent<BenchMonoBehaviour>() });
+            prefab.SetActive(false);
+
+            List<GameObject> created = new List<GameObject>(1000);
+
+            // 👑 PirexZenith
+            {
+                var builder = new PirexZenith.Core.ContainerBuilder();
+                builder.RegisterSingleton<BenchServiceA>();
+                var container = builder.Build();
+                var first = UnityContainerExtensions.Instantiate(container, prefab);
+                DestroyImmediate(first); // Warmup
+
+                Measure(() =>
+                {
+                    for (int i = 0; i < 1000; i++)
+                    {
+                        var go = UnityContainerExtensions.Instantiate(container, prefab);
+                        created.Add(go);
+                    }
+                }, out res.PirexMs, out res.PirexGc);
+
+                foreach (var go in created) DestroyImmediate(go);
+                created.Clear();
+            }
+
+            // VContainer
+#if PIREX_VCONTAINER_ENABLED
+            {
+                var builder = new VContainer.ContainerBuilder();
+                builder.Register<BenchServiceA>(VContainer.Lifetime.Singleton);
+                var container = builder.Build();
+                var first = UnityEngine.Object.Instantiate(prefab);
+                IObjectResolver resolver = container;
+                resolver.InjectGameObject(first);
+                DestroyImmediate(first); // Warmup
+
+                Measure(() =>
+                {
+                    for (int i = 0; i < 1000; i++)
+                    {
+                        var go = UnityEngine.Object.Instantiate(prefab);
+                        resolver.InjectGameObject(go);
+                        created.Add(go);
+                    }
+                }, out res.VContainerMs, out res.VContainerGc);
+
+                foreach (var go in created) DestroyImmediate(go);
+                created.Clear();
+            }
+#endif
+
+            // Reflex
+#if PIREX_REFLEX_ENABLED
+            {
+                var builder = new Reflex.Core.ContainerBuilder();
+                builder.RegisterType(typeof(BenchServiceA), Reflex.Enums.Lifetime.Singleton, Reflex.Enums.Resolution.Lazy);
+                var container = builder.Build();
+                var first = UnityEngine.Object.Instantiate(prefab);
+                Reflex.Injectors.AttributeInjector.Inject(first.GetComponent<BenchMonoBehaviour>(), container);
+                DestroyImmediate(first); // Warmup
+
+                Measure(() =>
+                {
+                    for (int i = 0; i < 1000; i++)
+                    {
+                        var go = UnityEngine.Object.Instantiate(prefab);
+                        Reflex.Injectors.AttributeInjector.Inject(go.GetComponent<BenchMonoBehaviour>(), container);
+                        created.Add(go);
+                    }
+                }, out res.ReflexMs, out res.ReflexGc);
+
+                foreach (var go in created) DestroyImmediate(go);
+                created.Clear();
+            }
+#endif
+
+            DestroyImmediate(prefab);
+            return res;
+        }
+
+        private void Measure(Action action, out double ms, out long gcAlloc)
+        {
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
+
+            long startMem = GC.GetAllocatedBytesForCurrentThread();
+            Stopwatch sw = Stopwatch.StartNew();
+
+            action();
+
+            sw.Stop();
+            long endMem = GC.GetAllocatedBytesForCurrentThread();
+
+            ms = sw.Elapsed.TotalMilliseconds;
+            gcAlloc = Math.Max(0, endMem - startMem);
+        }
+
+        private void LogMarkdownTable()
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine("### 🏁 3-Way DI Performance Benchmark Results (PirexZenith vs VContainer vs Reflex)");
+            sb.AppendLine();
+            sb.AppendLine("| Test Name | 👑 PirexZenith (ms / GC) | VContainer (ms / GC) | Reflex (ms / GC) |");
+            sb.AppendLine("| :--- | :---: | :---: | :---: |");
+
+            foreach (var res in _results)
+            {
+                sb.AppendLine($"| **{res.TestName}** | **{res.PirexMs:F2} ms** ({FormatMemory(res.PirexGc)}) | {res.VContainerMs:F2} ms ({FormatMemory(res.VContainerGc)}) | {res.ReflexMs:F2} ms ({FormatMemory(res.ReflexGc)}) |");
+            }
+
+            sb.AppendLine();
+            sb.AppendLine("*Benchmark executed via `DIBenchmarkRunner` in Unity Editor.*");
+            Debug.Log(sb.ToString());
+        }
+    }
+}
