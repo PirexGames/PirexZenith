@@ -109,6 +109,8 @@ namespace PirexZenith.Core
             return this;
         }
 
+        private readonly List<Action<IResolver>> _buildCallbacks = new List<Action<IResolver>>();
+
         /// <summary>
         /// Registers a service created by a custom factory delegate.
         /// </summary>
@@ -120,11 +122,27 @@ namespace PirexZenith.Core
         }
 
         /// <summary>
+        /// Registers a callback to be invoked immediately after the DIContainer is built (VContainer compatibility).
+        /// </summary>
+        public ContainerBuilder RegisterBuildCallback(Action<IResolver> callback)
+        {
+            if (callback != null)
+            {
+                _buildCallbacks.Add(callback);
+            }
+            return this;
+        }
+
+        /// <summary>
         /// Builds and returns an immutable DIContainer.
         /// </summary>
         public DIContainer Build()
         {
             var container = new DIContainer(_descriptors, _parent);
+            for (int i = 0; i < _buildCallbacks.Count; i++)
+            {
+                _buildCallbacks[i]?.Invoke(container);
+            }
             return container;
         }
     }

@@ -100,5 +100,66 @@ namespace PirexZenith.Unity
                 }
             }
         }
+
+        #region VContainer Compatibility Extensions
+
+        /// <summary>
+        /// VContainer compatibility: Injects dependencies into a GameObject using IResolver.
+        /// </summary>
+        public static void InjectGameObject(this IResolver resolver, GameObject instance)
+        {
+            if (resolver is DIContainer container)
+            {
+                InjectGameObject(container, instance);
+            }
+        }
+
+        /// <summary>
+        /// VContainer compatibility: Instantiates a Prefab GameObject using IResolver and injects dependencies.
+        /// </summary>
+        public static GameObject Instantiate(this IResolver resolver, GameObject prefab, Transform parent = null, bool instantiateInWorldSpace = false)
+        {
+            if (resolver is DIContainer container)
+            {
+                return container.Instantiate(prefab, parent, instantiateInWorldSpace);
+            }
+            throw new System.InvalidOperationException("[PirexZenith] Resolver must be a DIContainer instance to Instantiate GameObjects.");
+        }
+
+        /// <summary>
+        /// VContainer compatibility: Instantiates a Component Prefab using IResolver and injects dependencies.
+        /// </summary>
+        public static T Instantiate<T>(this IResolver resolver, T prefab, Transform parent = null, bool instantiateInWorldSpace = false) where T : Component
+        {
+            if (resolver is DIContainer container)
+            {
+                return container.Instantiate(prefab, parent, instantiateInWorldSpace);
+            }
+            throw new System.InvalidOperationException("[PirexZenith] Resolver must be a DIContainer instance to Instantiate GameObjects.");
+        }
+
+        /// <summary>
+        /// VContainer compatibility: Registers a Prefab so that when T is resolved, the Prefab is instantiated and injected.
+        /// </summary>
+        public static void RegisterComponentInNewPrefab<T>(this ContainerBuilder builder, T prefab, Lifetime lifetime = Lifetime.Singleton) where T : Component
+        {
+            if (builder == null) throw new System.ArgumentNullException(nameof(builder));
+            if (prefab == null) throw new System.ArgumentNullException(nameof(prefab));
+
+            builder.RegisterFactory(resolver => resolver.Instantiate(prefab), lifetime);
+        }
+
+        /// <summary>
+        /// VContainer compatibility: Registers a GameObject Prefab so that when resolved, the Prefab is instantiated and injected.
+        /// </summary>
+        public static void RegisterComponentInNewPrefab(this ContainerBuilder builder, GameObject prefab, Lifetime lifetime = Lifetime.Singleton)
+        {
+            if (builder == null) throw new System.ArgumentNullException(nameof(builder));
+            if (prefab == null) throw new System.ArgumentNullException(nameof(prefab));
+
+            builder.RegisterFactory(resolver => resolver.Instantiate(prefab), lifetime);
+        }
+
+        #endregion
     }
 }
