@@ -17,6 +17,7 @@ namespace PirexZenith.Core
         private readonly Dictionary<Type, object> _sharedSingletonsByType;
         private readonly HashSet<Type> _resolvingTypes;
         private readonly ConcurrentDictionary<Type, Func<object>> _fastResolvers;
+        private readonly ConcurrentDictionary<Type, Func<object>[]> _fastMultiResolvers;
         private readonly object _lock = new object();
         private bool _disposed;
 
@@ -33,6 +34,7 @@ namespace PirexZenith.Core
             _sharedSingletonsByType = new Dictionary<Type, object>();
             _resolvingTypes = new HashSet<Type>();
             _fastResolvers = new ConcurrentDictionary<Type, Func<object>>();
+            _fastMultiResolvers = new ConcurrentDictionary<Type, Func<object>[]>();
 
             foreach (var descriptor in descriptors)
             {
@@ -210,14 +212,18 @@ namespace PirexZenith.Core
 
         public List<T> ResolveAll<T>()
         {
-            var raw = ResolveAll(typeof(T));
-            var result = new List<T>(raw.Count);
-            for (int i = 0; i < raw.Count; i++)
+            if (_disposed) throw new ObjectDisposedException(nameof(DIContainer));
+
+            var type = typeof(T);
+            if (!_fastMultiResolvers.TryGetValue(type, out var resolvers))
             {
-                if (raw[i] is T item)
-                {
-                    result.Add(item);
-                }
+                resolvers = BuildFastMultiResolvers(type);
+            }
+
+            var result = new List<T>(resolvers.Length);
+            for (int i = 0; i < resolvers.Length; i++)
+            {
+                result.Add((T)resolvers[i]());
             }
             return result;
         }
@@ -226,25 +232,66 @@ namespace PirexZenith.Core
         {
             if (_disposed) throw new ObjectDisposedException(nameof(DIContainer));
 
-            List<object> results = new List<object>();
+            if (!_fastMultiResolvers.TryGetValue(type, out var resolvers))
+            {
+                resolvers = BuildFastMultiResolvers(type);
+            }
 
+            var result = new List<object>(resolvers.Length);
+            for (int i = 0; i < resolvers.Length; i++)
+            {
+                result.Add(resolvers[i]());
+            }
+            return result;
+        }
+
+        private Func<object>[] BuildFastMultiResolvers(Type type)
+        {
             lock (_lock)
             {
+                if (_fastMultiResolvers.TryGetValue(type, out var existing))
+                {
+                    return existing;
+                }
+
+                var descriptorList = new List<ServiceDescriptor>();
                 if (_bindings.TryGetValue(type, out var list))
                 {
-                    for (int i = 0; i < list.Count; i++)
+                    descriptorList.AddRange(list);
+                }
+
+                var currentParent = Parent;
+                while (currentParent != null)
+                {
+                    lock (currentParent._lock)
                     {
-                        results.Add(ResolveDescriptor(list[i]));
+                        if (currentParent._bindings.TryGetValue(type, out var parentList))
+                        {
+                            descriptorList.AddRange(parentList);
+                        }
+                    }
+                    currentParent = currentParent.Parent;
+                }
+
+                var resolvers = new Func<object>[descriptorList.Count];
+                for (int i = 0; i < descriptorList.Count; i++)
+                {
+                    var descriptor = descriptorList[i];
+                    if (descriptor.Lifetime == Lifetime.Singleton || descriptor.Lifetime == Lifetime.Instance)
+                    {
+                        var desc = descriptor;
+                        var instance = ResolveDescriptor(desc);
+                        resolvers[i] = () => instance;
+                    }
+                    else
+                    {
+                        resolvers[i] = BuildFastTransientResolver(descriptor);
                     }
                 }
-            }
 
-            if (Parent != null)
-            {
-                results.AddRange(Parent.ResolveAll(type));
+                _fastMultiResolvers[type] = resolvers;
+                return resolvers;
             }
-
-            return results;
         }
 
         public void Inject(object target)
@@ -437,6 +484,7 @@ namespace PirexZenith.Core
                 _sharedSingletonsByType.Clear();
                 _bindings.Clear();
                 _fastResolvers.Clear();
+                _fastMultiResolvers.Clear();
             }
         }
     }
