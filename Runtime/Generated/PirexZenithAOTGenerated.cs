@@ -16,6 +16,11 @@ namespace PirexZenith.Core.Generated
             PirexZenithAOTCache.Register<PirexZenith.Editor.Benchmark.BenchServiceA>(res => new PirexZenith.Editor.Benchmark.BenchServiceA());
             PirexZenithAOTCache.Register<PirexZenith.Editor.Benchmark.BenchServiceB>(res => new PirexZenith.Editor.Benchmark.BenchServiceB((PirexZenith.Editor.Benchmark.BenchServiceA)res.Resolve(typeof(PirexZenith.Editor.Benchmark.BenchServiceA))));
             PirexZenithAOTCache.Register<PirexZenith.Editor.Benchmark.BenchServiceC>(res => new PirexZenith.Editor.Benchmark.BenchServiceC((PirexZenith.Editor.Benchmark.BenchServiceB)res.Resolve(typeof(PirexZenith.Editor.Benchmark.BenchServiceB))));
+            PirexZenithAOTCache.Register<PirexZenith.Editor.Benchmark.BenchServiceD>(res => new PirexZenith.Editor.Benchmark.BenchServiceD((PirexZenith.Editor.Benchmark.BenchServiceC)res.Resolve(typeof(PirexZenith.Editor.Benchmark.BenchServiceC))));
+            PirexZenithAOTCache.Register<PirexZenith.Editor.Benchmark.BenchServiceE>(res => new PirexZenith.Editor.Benchmark.BenchServiceE((PirexZenith.Editor.Benchmark.BenchServiceD)res.Resolve(typeof(PirexZenith.Editor.Benchmark.BenchServiceD))));
+            PirexZenithAOTCache.Register<PirexZenith.Editor.Benchmark.BenchMulti1>(res => new PirexZenith.Editor.Benchmark.BenchMulti1());
+            PirexZenithAOTCache.Register<PirexZenith.Editor.Benchmark.BenchMulti2>(res => new PirexZenith.Editor.Benchmark.BenchMulti2());
+            PirexZenithAOTCache.Register<PirexZenith.Editor.Benchmark.BenchMulti3>(res => new PirexZenith.Editor.Benchmark.BenchMulti3());
             PirexZenithAOTCache.Register<PirexZenith.Editor.Benchmark.BenchDummyService>(res => new PirexZenith.Editor.Benchmark.BenchDummyService());
             PirexZenithAOTCache.Register<PirexZenith.Examples.GameplaySample.GameplayScoreSystem>(res => new PirexZenith.Examples.GameplaySample.GameplayScoreSystem((PirexZenith.Examples.GameplaySample.IAudioService)res.Resolve(typeof(PirexZenith.Examples.GameplaySample.IAudioService)), (PirexZenith.Examples.GameplaySample.IGameStateService)res.Resolve(typeof(PirexZenith.Examples.GameplaySample.IGameStateService))));
         }
