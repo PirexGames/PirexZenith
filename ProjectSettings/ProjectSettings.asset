@@ -773,7 +773,7 @@ PlayerSettings:
   webWasm2023: 0
   webEnableSubmoduleStrippingCompatibility: 0
   scriptingDefineSymbols:
-    Standalone: PIREX_REXPOOL_ENABLED
+    Standalone: PIREX_REXPOOL_ENABLED;PIREX_REFLEX_ENABLED;PIREX_VCONTAINER_ENABLED
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

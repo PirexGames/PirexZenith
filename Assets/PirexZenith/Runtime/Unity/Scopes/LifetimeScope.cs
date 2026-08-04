@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using PirexZenith.Core;
 using PirexZenith.Core.Lifecycle;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace PirexZenith.Unity
 {
@@ -21,6 +22,7 @@ namespace PirexZenith.Unity
         public static readonly List<LifetimeScope> ActiveScopes = new List<LifetimeScope>();
 
         [Header("Installers")]
+        [FormerlySerializedAs("installers")]
         [SerializeField]
         private List<MonoInstaller> _installers = new List<MonoInstaller>();
 

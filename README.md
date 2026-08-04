@@ -418,3 +418,21 @@ Trải nghiệm ngay trong Unity Editor bằng cách vào menu:
 Tools ➔ Examples ➔ 🚀 Generate Gameplay Sample Scene & Prefab
 ```
 Hệ thống sẽ tự động tạo Scene mẫu (`GameplaySampleScene.unity`) và Prefab (`EnemyPrefab.prefab`) đã được kết nối trọn vẹn DI & Object Pooling chỉ trong 1 giây. Nhấn **PLAY** để kiểm thử ngay!
+
+---
+
+### 9. Công cụ Migrate Tự Động từ VContainer sang PirexZenith (One-Click Migration)
+PirexZenith tích hợp sẵn bộ công cụ chuyển đổi AST & Regex trực quan giúp nâng cấp dự án đang dùng **VContainer** sang **PirexZenith** chỉ với 1 cú nhấp chuột:
+```text
+Tools ➔ PirexZenith ➔ 🛠️ VContainer to PirexZenith Migrator
+```
+* **Quét tự động (Scan Project):** Phát hiện mọi script `.cs` trong dự án có sử dụng `using VContainer;`, `IContainerBuilder`, `IObjectResolver`, `Lifetime.Singleton/Transient`, v.v.
+* **Chuyển đổi cú pháp binding trơn tru:**
+  * `builder.Register<Service>(Lifetime.Singleton).As<IService>()` ➔ `builder.RegisterSingleton<Service, IService>()`
+  * `builder.RegisterEntryPoint<System>()` ➔ `builder.RegisterSystem<System>()`
+  * `builder.RegisterComponent(component)` ➔ `builder.RegisterInstance(component)`
+* **Hỗ trợ trọn vẹn Prefab & Scene Scope (2 Tabs trực quan):**
+  * **Tab 1: C# Scripts (.cs):** Chuyển đổi trơn tru cú pháp đăng ký binding và tích hợp sẵn các hàm mở rộng tương thích (`builder.RegisterComponentInNewPrefab`, `resolver.Instantiate`, `resolver.InjectGameObject`).
+  * **Tab 2: Scenes & Prefabs (.unity / .prefab):** Quét toàn bộ nội dung YAML của tất cả các file Scene và Prefab trong toàn bộ dự án, tự động phát hiện GUID script `LifetimeScope` cũ (hoặc cho phép nhập thủ công) và thay thế đồng loạt thành GUID chính thức của `PirexZenith.Unity.LifetimeScope` (`a3de49ab71c13804a9ef0424934de8ee`).
+  * Nhờ thuộc tính `[FormerlySerializedAs("installers")]`, mọi liên kết tới danh sách Installer trong các Scene/Prefab cũ được tự động bảo toàn 100% khi nâng cấp.
+* **An toàn tuyệt đối:** Tự động tạo file sao lưu `.bak` cho cả Script lẫn Scene/Prefab trước khi thực hiện ghi đè.
