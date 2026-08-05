@@ -76,6 +76,7 @@ namespace PirexZenith.Editor
                 var name = asm.GetName().Name;
                 if (name.StartsWith("UnityEngine", StringComparison.OrdinalIgnoreCase) ||
                     name.StartsWith("UnityEditor", StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("Editor") || // Bỏ qua tất cả các Assembly chứa chữ Editor (VD: Assembly-CSharp-Editor)
                     name.StartsWith("System", StringComparison.OrdinalIgnoreCase) ||
                     name.StartsWith("Mono.", StringComparison.OrdinalIgnoreCase) ||
                     name.StartsWith("mscorlib", StringComparison.OrdinalIgnoreCase) ||
@@ -97,6 +98,10 @@ namespace PirexZenith.Editor
 
                 foreach (var type in types)
                 {
+                    // Skip types that are internal, private, or protected.
+                    // The globally generated AOT file cannot access them if they are in other assemblies or nested.
+                    if (!type.IsPublic && !type.IsNestedPublic) continue;
+
                     if (type.IsClass && !type.IsAbstract && !type.IsGenericTypeDefinition && !type.IsInterface &&
                         !type.Name.Contains("<") && !type.Name.Contains("$") && !type.Name.Contains("`") &&
                         !Attribute.IsDefined(type, typeof(System.Runtime.CompilerServices.CompilerGeneratedAttribute)) &&
