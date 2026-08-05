@@ -104,12 +104,23 @@ namespace PirexZenith
                 }
             }
 
+            Configure(builder);
+
             // Register this LifetimeScope instance into the container
             builder.RegisterInstance(this);
             builder.RegisterInstance<LifetimeScope>(this);
 
             Container = builder.Build();
             InitializeSystems();
+        }
+
+        /// <summary>
+        /// Override this method to programmatically configure container bindings without needing a separate MonoInstaller.
+        /// This provides direct compatibility with VContainer's LifetimeScope pattern.
+        /// </summary>
+        protected virtual void Configure(ContainerBuilder builder)
+        {
+            // By default, it does nothing unless overridden.
         }
 
         /// <summary>
