@@ -89,6 +89,15 @@ namespace PirexZenith.Editor.Migration
                 "• All conversions can create a .bak backup file for safety.\n" +
                 "• We recommend committing existing work to Git before running automated migration.",
                 MessageType.Info);
+
+            EditorGUILayout.BeginHorizontal();
+            GUILayout.FlexibleSpace();
+            if (GUILayout.Button("🗑️ Delete All .bak Files in Project", GUILayout.Width(240), GUILayout.Height(24)))
+            {
+                CleanUpBackupFiles();
+            }
+            EditorGUILayout.EndHorizontal();
+
             EditorGUILayout.Space(5);
         }
 
@@ -942,6 +951,43 @@ namespace PirexZenith.Editor.Migration
             }
 
             return string.Join("\r\n", output);
+        }
+
+        private void CleanUpBackupFiles()
+        {
+            var assetsBak = Directory.Exists(Application.dataPath) ? Directory.GetFiles(Application.dataPath, "*.bak", SearchOption.AllDirectories) : new string[0];
+            var packagesPath = Path.Combine(Directory.GetCurrentDirectory(), "Packages");
+            var packagesBak = Directory.Exists(packagesPath) ? Directory.GetFiles(packagesPath, "*.bak", SearchOption.AllDirectories) : new string[0];
+            
+            var allBakFiles = new List<string>(assetsBak);
+            allBakFiles.AddRange(packagesBak);
+
+            if (allBakFiles.Count == 0)
+            {
+                EditorUtility.DisplayDialog("Clean Up", "No .bak files found in the project.", "OK");
+                return;
+            }
+
+            if (EditorUtility.DisplayDialog("Delete Backups", 
+                $"Found {allBakFiles.Count} .bak file(s) in the project.\nAre you sure you want to permanently delete them?", 
+                "Delete All", "Cancel"))
+            {
+                int count = 0;
+                foreach (var file in allBakFiles)
+                {
+                    try
+                    {
+                        File.Delete(file);
+                        count++;
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError($"[PirexZenith Migrator] Failed to delete backup: {file}\n{ex}");
+                    }
+                }
+                AssetDatabase.Refresh();
+                Debug.Log($"[PirexZenith Migrator] Successfully deleted {count} backup file(s).");
+            }
         }
 
         #endregion

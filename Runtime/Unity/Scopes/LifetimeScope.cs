@@ -60,6 +60,13 @@ namespace PirexZenith
         private List<IDisposable> _disposables;
 
         /// <summary>
+        /// If true, this scope is automatically added to the global ActiveScopes list, making it eligible
+        /// to become the parent of other scopes dynamically. Set to false for isolated scopes (e.g. UI Common Scopes) 
+        /// that only need to perform self-injection without acting as parents.
+        /// </summary>
+        protected virtual bool AutoRegisterToActiveScopes => true;
+
+        /// <summary>
         /// Manually assigns a parent container to this LifetimeScope before Awake/Initialize.
         /// (Tier 1 Resolution)
         /// </summary>
@@ -70,7 +77,7 @@ namespace PirexZenith
 
         protected virtual void Awake()
         {
-            if (!ActiveScopes.Contains(this))
+            if (AutoRegisterToActiveScopes && !ActiveScopes.Contains(this))
             {
                 ActiveScopes.Add(this);
             }
