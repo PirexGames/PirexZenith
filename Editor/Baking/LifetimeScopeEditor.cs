@@ -1,5 +1,4 @@
-using PirexZenith.Unity;
-using UnityEditor;
+﻿using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -39,23 +38,23 @@ namespace PirexZenith.Editor
             serializedObject.ApplyModifiedProperties();
 
             EditorGUILayout.Space(10);
-            EditorGUILayout.LabelField("👑 PirexZenith LifetimeScope Status", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("ðŸ‘‘ PirexZenith LifetimeScope Status", EditorStyles.boldLabel);
 
             if (string.Equals(scope.ParentScopeName, "None", System.StringComparison.OrdinalIgnoreCase))
             {
-                EditorGUILayout.HelpBox("🔗 Standalone Scope (None): This scope operates independently without inheriting from any parent container.", MessageType.None);
+                EditorGUILayout.HelpBox("ðŸ”— Standalone Scope (None): This scope operates independently without inheriting from any parent container.", MessageType.None);
             }
             else if (!string.IsNullOrEmpty(scope.ParentScopeName))
             {
-                EditorGUILayout.HelpBox($"🔗 Named Parent Lookup: During initialization, this scope will resolve an active parent scope matching class name (nameof) or scene '{scope.ParentScopeName}'.", MessageType.None);
+                EditorGUILayout.HelpBox($"ðŸ”— Named Parent Lookup: During initialization, this scope will resolve an active parent scope matching class name (nameof) or scene '{scope.ParentScopeName}'.", MessageType.None);
             }
             else
             {
-                EditorGUILayout.HelpBox("🔗 Auto Parent Lookup (Default): During initialization, this scope will automatically link to the most recent active parent scope (e.g. SceneScope / ProjectScope).", MessageType.None);
+                EditorGUILayout.HelpBox("ðŸ”— Auto Parent Lookup (Default): During initialization, this scope will automatically link to the most recent active parent scope (e.g. SceneScope / ProjectScope).", MessageType.None);
             }
 
             EditorGUILayout.Space(5);
-            EditorGUILayout.LabelField("⚡ Auto-Baking & Performance Control", EditorStyles.boldLabel);
+            EditorGUILayout.LabelField("âš¡ Auto-Baking & Performance Control", EditorStyles.boldLabel);
 
             int bakedCount = scope.bakedTargets != null ? scope.bakedTargets.Count : 0;
             if (bakedCount > 0)
@@ -70,7 +69,7 @@ namespace PirexZenith.Editor
             EditorGUILayout.Space(5);
             EditorGUILayout.BeginHorizontal();
 
-            if (GUILayout.Button("⚡ Bake Targets (Scene/Prefab)", GUILayout.Height(28)))
+            if (GUILayout.Button("âš¡ Bake Targets (Scene/Prefab)", GUILayout.Height(28)))
             {
                 var stopwatch = System.Diagnostics.Stopwatch.StartNew();
                 int count = 0;
@@ -96,7 +95,7 @@ namespace PirexZenith.Editor
                 }
             }
 
-            if (GUILayout.Button("🗑 Clear Baked Targets", GUILayout.Height(28)))
+            if (GUILayout.Button("ðŸ—‘ Clear Baked Targets", GUILayout.Height(28)))
             {
                 if (scope.bakedTargets != null)
                 {

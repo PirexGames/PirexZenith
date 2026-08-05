@@ -1,4 +1,4 @@
-namespace PirexZenith.Core.Lifecycle
+﻿namespace PirexZenith
 {
     /// <summary>
     /// Interface for Pure C# Systems requiring execution at the end of each frame

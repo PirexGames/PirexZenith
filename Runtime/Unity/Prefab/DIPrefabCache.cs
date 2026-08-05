@@ -1,7 +1,7 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace PirexZenith.Unity
+namespace PirexZenith
 {
     /// <summary>
     /// Component storing a cached list of MonoBehaviour targets requiring injection on a Prefab.

@@ -1,10 +1,9 @@
-#if PIREX_REXPOOL_ENABLED
+﻿#if PIREX_REXPOOL_ENABLED
 using PirexGames.RexPool;
 #endif
-using PirexZenith.Core;
 using UnityEngine;
 
-namespace PirexZenith.Unity
+namespace PirexZenith
 {
     /// <summary>
     /// Extension methods integrating RexPoolManager object pooling with DIContainer dependency injection.
@@ -81,7 +80,7 @@ namespace PirexZenith.Unity
         }
 
         /// <summary>
-        /// Core take — O(1) amortized when RexPool is present. Automatically injects dependencies into newly created instances.
+        /// Core take â€” O(1) amortized when RexPool is present. Automatically injects dependencies into newly created instances.
         /// </summary>
         public static GameObject TakeRPO(
             this DIContainer container,
@@ -92,7 +91,7 @@ namespace PirexZenith.Unity
         }
 
         /// <summary>
-        /// Core take at a specified position and rotation — O(1) amortized when RexPool is present.
+        /// Core take at a specified position and rotation â€” O(1) amortized when RexPool is present.
         /// </summary>
         public static GameObject TakeRPO(
             this DIContainer container,

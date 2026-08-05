@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using PirexZenith.Core;
-using PirexZenith.Core.Lifecycle;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-namespace PirexZenith.Unity
+namespace PirexZenith
 {
     /// <summary>
     /// Versatile scope managing the lifecycle of a DIContainer in Unity.

@@ -1,8 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using PirexZenith.Core;
-using PirexZenith.Unity;
+using PirexZenith;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;

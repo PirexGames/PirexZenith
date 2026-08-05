@@ -1,7 +1,6 @@
-using PirexZenith.Core;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace PirexZenith.Unity
+namespace PirexZenith
 {
     /// <summary>
     /// Base class for MonoBehaviour installers attached to GameObjects in a Unity Scene.

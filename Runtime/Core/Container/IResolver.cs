@@ -1,7 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
-namespace PirexZenith.Core
+namespace PirexZenith
 {
     /// <summary>
     /// Core interface for dependency resolution and injection.

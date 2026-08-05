@@ -1,6 +1,6 @@
-using System;
+﻿using System;
 
-namespace PirexZenith.Core
+namespace PirexZenith
 {
     /// <summary>
     /// Describes a registered service binding in the container.
