@@ -239,15 +239,33 @@ namespace PirexZenith
             }
 
             // 3. Automatic Fallback: If ParentScopeName is empty ("") (default value),
-            // automatically link to the most recent active parent scope (e.g., SceneScope / ProjectScope) in ActiveScopes!
+            // automatically link to the most recent active parent scope in the SAME scene,
+            // OR to a Global Project Scope (DontDestroyOnLoad).
             if (!string.Equals(targetName, "None", StringComparison.OrdinalIgnoreCase))
             {
+                // Pass 1: Try to find a scope in the SAME scene (e.g. for Prefabs / Sub-scopes)
                 for (int i = ActiveScopes.Count - 1; i >= 0; i--)
                 {
                     var scope = ActiveScopes[i];
                     if (scope != null && scope != this && scope.Container != null)
                     {
-                        return scope.Container;
+                        if (scope.gameObject.scene == this.gameObject.scene)
+                        {
+                            return scope.Container;
+                        }
+                    }
+                }
+
+                // Pass 2: Try to find a Global scope (DontDestroyOnLoad)
+                for (int i = ActiveScopes.Count - 1; i >= 0; i--)
+                {
+                    var scope = ActiveScopes[i];
+                    if (scope != null && scope != this && scope.Container != null)
+                    {
+                        if (scope.gameObject.scene.buildIndex == -1 || string.Equals(scope.gameObject.scene.name, "DontDestroyOnLoad", StringComparison.OrdinalIgnoreCase))
+                        {
+                            return scope.Container;
+                        }
                     }
                 }
             }
