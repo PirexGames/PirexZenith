@@ -1,6 +1,4 @@
-using PirexZenith.Core;
-using PirexZenith.Unity;
-using UnityEngine;
+﻿using PirexZenith;using PirexZenith;using UnityEngine;
 
 namespace PirexZenith.Examples.GameplaySample
 {

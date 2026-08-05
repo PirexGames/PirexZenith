@@ -1,6 +1,4 @@
-using PirexZenith.Core;
-
-namespace PirexZenith.Unity
+﻿namespace PirexZenith
 {
     /// <summary>
     /// Core interface for service installers.

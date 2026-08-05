@@ -1,10 +1,10 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Reflection;
 
-namespace PirexZenith.Core
+namespace PirexZenith
 {
     /// <summary>
     /// Immutable Dependency Injection container created by ContainerBuilder.
@@ -52,7 +52,7 @@ namespace PirexZenith.Core
                 }
             }
 
-            // Tự đăng ký IResolver và DIContainer trỏ về chính container này
+            // Tá»± Ä‘Äƒng kÃ½ IResolver vÃ  DIContainer trá» vá» chÃ­nh container nÃ y
             var selfDescriptor1 = new ServiceDescriptor(typeof(IResolver), this);
             var selfDescriptor2 = new ServiceDescriptor(typeof(DIContainer), this);
             _bindings[typeof(IResolver)] = new List<ServiceDescriptor> { selfDescriptor1 };
@@ -72,7 +72,7 @@ namespace PirexZenith.Core
 
             if (!TryResolve(type, out var result))
             {
-                throw new DIException($"[PirexZenith] Không tìm thấy Binding được đăng ký cho Type: {type.FullName}");
+                throw new DIException($"[PirexZenith] KhÃ´ng tÃ¬m tháº¥y Binding Ä‘Æ°á»£c Ä‘Äƒng kÃ½ cho Type: {type.FullName}");
             }
             return result;
         }
@@ -107,7 +107,7 @@ namespace PirexZenith.Core
             {
                 if (_bindings.TryGetValue(type, out var list) && list.Count > 0)
                 {
-                    var descriptor = list[list.Count - 1]; // Lấy binding cuối cùng (mặc định)
+                    var descriptor = list[list.Count - 1]; // Láº¥y binding cuá»‘i cÃ¹ng (máº·c Ä‘á»‹nh)
                     if (descriptor.Lifetime == Lifetime.Singleton || descriptor.Lifetime == Lifetime.Instance)
                     {
                         var instance = ResolveDescriptor(descriptor);
@@ -308,7 +308,7 @@ namespace PirexZenith.Core
                 {
                     return instance;
                 }
-                // Nếu cùng một ImplementationType (không dùng Factory riêng) đã tạo Singleton trước đó, chia sẻ chung instance!
+                // Náº¿u cÃ¹ng má»™t ImplementationType (khÃ´ng dÃ¹ng Factory riÃªng) Ä‘Ã£ táº¡o Singleton trÆ°á»›c Ä‘Ã³, chia sáº» chung instance!
                 if (descriptor.Factory == null && _sharedSingletonsByType.TryGetValue(descriptor.ImplementationType, out var shared))
                 {
                     _singletonInstances[descriptor] = shared;
@@ -318,7 +318,7 @@ namespace PirexZenith.Core
 
             if (!_resolvingTypes.Add(descriptor.ServiceType))
             {
-                throw new DIException($"[PirexZenith] Phát hiện phụ thuộc vòng tròn (Circular Dependency) khi Resolve Type: {descriptor.ServiceType.FullName}");
+                throw new DIException($"[PirexZenith] PhÃ¡t hiá»‡n phá»¥ thuá»™c vÃ²ng trÃ²n (Circular Dependency) khi Resolve Type: {descriptor.ServiceType.FullName}");
             }
 
             try
@@ -408,7 +408,7 @@ namespace PirexZenith.Core
             var constructors = type.GetConstructors(BindingFlags.Public | BindingFlags.Instance);
             ConstructorInfo chosenConstructor = null;
 
-            // Ưu tiên constructor có đánh dấu [Inject]
+            // Æ¯u tiÃªn constructor cÃ³ Ä‘Ã¡nh dáº¥u [Inject]
             foreach (var ctor in constructors)
             {
                 if (Attribute.IsDefined(ctor, typeof(InjectAttribute)))
@@ -418,7 +418,7 @@ namespace PirexZenith.Core
                 }
             }
 
-            // Nếu không có, chọn constructor có nhiều tham số nhất (Zero LINQ / Zero GC)
+            // Náº¿u khÃ´ng cÃ³, chá»n constructor cÃ³ nhiá»u tham sá»‘ nháº¥t (Zero LINQ / Zero GC)
             if (chosenConstructor == null && constructors.Length > 0)
             {
                 int maxParams = -1;

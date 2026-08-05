@@ -27,7 +27,7 @@ namespace PirexZenith.Editor.Migration
         }
 
         private int _currentTab = 0;
-        private readonly string[] _tabNames = { "1. C# Scripts (.cs)", "2. Scenes & Prefabs (.unity / .prefab)" };
+        private readonly string[] _tabNames = { "1. C# Scripts (.cs)", "2. Scenes & Prefabs", "3. Assemblies (.asmdef)" };
 
         // Script scanning state
         private List<MigratedFileItem> _detectedScripts = new List<MigratedFileItem>();
@@ -37,6 +37,10 @@ namespace PirexZenith.Editor.Migration
         private List<MigratedFileItem> _detectedAssets = new List<MigratedFileItem>();
         private Vector2 _assetScrollPosition;
         private string _customOldGuids = "";
+
+        // Asmdef scanning state
+        private List<MigratedFileItem> _detectedAsmdefs = new List<MigratedFileItem>();
+        private Vector2 _asmdefScrollPosition;
 
         private bool _createBackups = true;
         private string _statusMessage = "Select a tab above and click 'Scan Project' to detect VContainer files.";
@@ -65,9 +69,13 @@ namespace PirexZenith.Editor.Migration
             {
                 DrawScriptTab();
             }
-            else
+            else if (_currentTab == 1)
             {
                 DrawSceneAndPrefabTab();
+            }
+            else
+            {
+                DrawAsmdefTab();
             }
         }
 
@@ -563,7 +571,7 @@ namespace PirexZenith.Editor.Migration
 
         private void MigrateActiveSceneScopes()
         {
-            var activeScopes = UnityEngine.Object.FindObjectsOfType<PirexZenith.Unity.LifetimeScope>(true);
+            var activeScopes = UnityEngine.Object.FindObjectsOfType<PirexZenith.LifetimeScope>(true);
             int updatedScopes = 0;
 
             foreach (var scope in activeScopes)
@@ -581,6 +589,192 @@ namespace PirexZenith.Editor.Migration
             _statusMessage = $"Successfully verified and refreshed {updatedScopes} LifetimeScope component(s) in active loaded scene!";
             _statusType = MessageType.Info;
             Debug.Log($"[PirexZenith Migrator] {_statusMessage}");
+        }
+
+        #endregion
+
+        #region Tab 3: Assemblies (.asmdef)
+
+        private void DrawAsmdefTab()
+        {
+            EditorGUILayout.LabelField("Project-Wide Assembly (.asmdef / .asmref) Migrator", EditorStyles.boldLabel);
+            EditorGUILayout.HelpBox(
+                "This tab scans all .asmdef and .asmref files in your project and automatically updates " +
+                "any 'VContainer' references to use the unified 'PirexZenith' assembly.",
+                MessageType.Info);
+            EditorGUILayout.Space(5);
+
+            EditorGUILayout.BeginHorizontal();
+
+            if (GUILayout.Button("🔍 Scan Project for VContainer Assembly References", GUILayout.Height(30)))
+            {
+                ScanAsmdefs();
+            }
+
+            if (GUILayout.Button("Select All", GUILayout.Width(90), GUILayout.Height(30)))
+            {
+                SetAllSelected(_detectedAsmdefs, true);
+            }
+
+            if (GUILayout.Button("Deselect All", GUILayout.Width(90), GUILayout.Height(30)))
+            {
+                SetAllSelected(_detectedAsmdefs, false);
+            }
+
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.Space(5);
+            _createBackups = EditorGUILayout.ToggleLeft("Create .bak backups before modifying files", _createBackups);
+            EditorGUILayout.Space(5);
+
+            if (!string.IsNullOrEmpty(_statusMessage))
+            {
+                EditorGUILayout.HelpBox(_statusMessage, _statusType);
+                EditorGUILayout.Space(5);
+            }
+
+            EditorGUILayout.LabelField($"Detected Assemblies ({_detectedAsmdefs.Count}):", EditorStyles.boldLabel);
+
+            _asmdefScrollPosition = EditorGUILayout.BeginScrollView(_asmdefScrollPosition, EditorStyles.helpBox);
+
+            if (_detectedAsmdefs.Count == 0)
+            {
+                EditorGUILayout.LabelField("No old assembly references detected.", EditorStyles.centeredGreyMiniLabel);
+            }
+            else
+            {
+                for (int i = 0; i < _detectedAsmdefs.Count; i++)
+                {
+                    var item = _detectedAsmdefs[i];
+                    EditorGUILayout.BeginHorizontal();
+
+                    item.IsSelected = EditorGUILayout.Toggle(item.IsSelected, GUILayout.Width(20));
+
+                    var style = new GUIStyle(EditorStyles.label) { wordWrap = false };
+                    EditorGUILayout.LabelField(item.AssetPath, style, GUILayout.ExpandWidth(true));
+                    EditorGUILayout.LabelField($"[{item.DetectedFeatures}] ({item.EstimatedReplacements} replacement(s))", EditorStyles.miniLabel, GUILayout.Width(260));
+
+                    if (GUILayout.Button("Open", GUILayout.Width(50)))
+                    {
+                        var asset = AssetDatabase.LoadMainAssetAtPath(item.AssetPath);
+                        if (asset != null) AssetDatabase.OpenAsset(asset);
+                    }
+
+                    EditorGUILayout.EndHorizontal();
+                }
+            }
+
+            EditorGUILayout.EndScrollView();
+
+            EditorGUILayout.Space(10);
+            int selectedCount = GetSelectedCount(_detectedAsmdefs);
+            GUI.enabled = selectedCount > 0;
+            if (GUILayout.Button($"⚡ Replace Assembly References in {selectedCount} Selected Asset(s)", GUILayout.Height(36)))
+            {
+                if (EditorUtility.DisplayDialog(
+                        "Confirm Assembly Migration",
+                        $"Are you sure you want to replace 'VContainer' with 'PirexZenith' in {selectedCount} assembly file(s)?\n\n" +
+                        (_createBackups ? ".bak backup files will be created." : "WARNING: Backup is disabled."),
+                        "Replace Now",
+                        "Cancel"))
+                {
+                    MigrateSelectedAsmdefs();
+                }
+            }
+            GUI.enabled = true;
+            EditorGUILayout.Space(10);
+        }
+
+        private void ScanAsmdefs()
+        {
+            _detectedAsmdefs.Clear();
+            string[] guids = AssetDatabase.FindAssets("t:asmdef t:asmref", new[] { "Assets" });
+            int scanned = 0;
+
+            foreach (string guid in guids)
+            {
+                string assetPath = AssetDatabase.GUIDToAssetPath(guid);
+                if (string.IsNullOrEmpty(assetPath)) continue;
+
+                // Skip framework internal if needed, but inspect project assemblies
+                if (assetPath.Contains("/PirexZenith/Runtime/") || assetPath.Contains("/PirexZenith/Editor/"))
+                    continue;
+
+                string fullPath = Path.GetFullPath(assetPath);
+                if (!File.Exists(fullPath)) continue;
+
+                string content = File.ReadAllText(fullPath);
+                int replacements = 0;
+                
+                // Extremely simple regex to find "VContainer" string reference in JSON array
+                if (Regex.IsMatch(content, @"\""VContainer\"""))
+                {
+                    replacements++;
+                }
+
+                if (replacements > 0)
+                {
+                    _detectedAsmdefs.Add(new MigratedFileItem
+                    {
+                        AssetPath = assetPath,
+                        FullPath = fullPath,
+                        IsSelected = true,
+                        DetectedFeatures = "VContainer Reference",
+                        EstimatedReplacements = replacements
+                    });
+                }
+                scanned++;
+            }
+
+            if (_detectedAsmdefs.Count > 0)
+            {
+                _statusMessage = $"Assembly scan complete! Found {_detectedAsmdefs.Count} file(s) referencing VContainer across {scanned} inspected file(s).";
+                _statusType = MessageType.Info;
+            }
+            else
+            {
+                _statusMessage = $"Assembly scan complete! No VContainer references were found across {scanned} inspected file(s).";
+                _statusType = MessageType.Warning;
+            }
+        }
+
+        private void MigrateSelectedAsmdefs()
+        {
+            int migratedCount = 0;
+            int totalReplacements = 0;
+
+            for (int i = 0; i < _detectedAsmdefs.Count; i++)
+            {
+                var item = _detectedAsmdefs[i];
+                if (!item.IsSelected) continue;
+
+                string fullPath = item.FullPath;
+                if (!File.Exists(fullPath)) continue;
+
+                string content = File.ReadAllText(fullPath);
+                string newContent = Regex.Replace(content, @"\""VContainer\""", "\"PirexZenith\"");
+
+                if (newContent != content)
+                {
+                    if (_createBackups)
+                    {
+                        string bakPath = fullPath + ".bak";
+                        File.WriteAllText(bakPath, content);
+                    }
+
+                    File.WriteAllText(fullPath, newContent);
+                    migratedCount++;
+                    totalReplacements++;
+                }
+            }
+
+            AssetDatabase.Refresh();
+
+            _statusMessage = $"Successfully migrated {migratedCount} assembly file(s) to reference PirexZenith!";
+            _statusType = MessageType.Info;
+            Debug.Log($"[PirexZenith Migrator] {_statusMessage}");
+
+            ScanAsmdefs();
         }
 
         #endregion
@@ -651,15 +845,12 @@ namespace PirexZenith.Editor.Migration
             // 1. Namespaces
             if (code.Contains("using VContainer.Unity;"))
             {
-                code = Regex.Replace(code, @"using\s+VContainer\.Unity\s*;", "using PirexZenith.Unity;");
+                code = Regex.Replace(code, @"using\s+VContainer\.Unity\s*;", "using PirexZenith;");
                 edits++;
             }
             if (code.Contains("using VContainer;"))
             {
-                string replacement = code.Contains("using PirexZenith.Unity;")
-                    ? "using PirexZenith.Core;"
-                    : "using PirexZenith.Core;\r\nusing PirexZenith.Unity;";
-                code = Regex.Replace(code, @"using\s+VContainer\s*;", replacement);
+                code = Regex.Replace(code, @"using\s+VContainer\s*;", "using PirexZenith;");
                 edits++;
             }
 

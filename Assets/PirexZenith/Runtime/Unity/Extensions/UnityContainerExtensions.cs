@@ -1,8 +1,7 @@
-using System.Collections.Generic;
-using PirexZenith.Core;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace PirexZenith.Unity
+namespace PirexZenith
 {
     /// <summary>
     /// Extension methods for DIContainer when interacting with Unity objects (e.g., Prefab instantiation).

@@ -1,6 +1,6 @@
-using System;
+﻿using System;
 
-namespace PirexZenith.Core
+namespace PirexZenith
 {
     /// <summary>
     /// Marks a field, property, method, or constructor for Dependency Injection by PirexZenith.

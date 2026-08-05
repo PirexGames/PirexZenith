@@ -2,8 +2,7 @@
     "name": "PirexZenith.Benchmark",
     "rootNamespace": "PirexZenith.Editor.Benchmark",
     "references": [
-        "PirexZenith.Core",
-        "PirexZenith.Unity",
+        "PirexZenith",
         "PirexZenith.Editor",
         "VContainer",
         "Reflex"

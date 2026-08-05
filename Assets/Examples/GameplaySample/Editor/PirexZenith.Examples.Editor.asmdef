@@ -2,10 +2,9 @@
     "name": "PirexZenith.Examples.Editor",
     "rootNamespace": "PirexZenith.Examples.Editor",
     "references": [
-        "PirexZenith.Core",
-        "PirexZenith.Unity",
         "PirexZenith.Editor",
-        "PirexZenith.Examples"
+        "PirexZenith.Examples",
+        "PirexZenith"
     ],
     "includePlatforms": [
         "Editor"

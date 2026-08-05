@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace PirexZenith.Core
+namespace PirexZenith
 {
     /// <summary>
     /// Builder used to register service bindings before creating an immutable DIContainer.
@@ -57,21 +57,21 @@ namespace PirexZenith.Core
             Type type = typeof(TSystem);
             RegisterSingleton<TSystem>();
 
-            if (typeof(PirexZenith.Core.Lifecycle.IInitializable).IsAssignableFrom(type))
+            if (typeof(IInitializable).IsAssignableFrom(type))
             {
-                RegisterSingleton(type, typeof(PirexZenith.Core.Lifecycle.IInitializable));
+                RegisterSingleton(type, typeof(IInitializable));
             }
-            if (typeof(PirexZenith.Core.Lifecycle.ITickable).IsAssignableFrom(type))
+            if (typeof(ITickable).IsAssignableFrom(type))
             {
-                RegisterSingleton(type, typeof(PirexZenith.Core.Lifecycle.ITickable));
+                RegisterSingleton(type, typeof(ITickable));
             }
-            if (typeof(PirexZenith.Core.Lifecycle.IFixedTickable).IsAssignableFrom(type))
+            if (typeof(IFixedTickable).IsAssignableFrom(type))
             {
-                RegisterSingleton(type, typeof(PirexZenith.Core.Lifecycle.IFixedTickable));
+                RegisterSingleton(type, typeof(IFixedTickable));
             }
-            if (typeof(PirexZenith.Core.Lifecycle.ILateTickable).IsAssignableFrom(type))
+            if (typeof(ILateTickable).IsAssignableFrom(type))
             {
-                RegisterSingleton(type, typeof(PirexZenith.Core.Lifecycle.ILateTickable));
+                RegisterSingleton(type, typeof(ILateTickable));
             }
             if (typeof(IDisposable).IsAssignableFrom(type))
             {

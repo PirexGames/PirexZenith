@@ -1,8 +1,7 @@
 {
-    "name": "PirexZenith.Unity",
-    "rootNamespace": "PirexZenith.Unity",
+    "name": "PirexZenith",
+    "rootNamespace": "PirexZenith",
     "references": [
-        "PirexZenith.Core",
         "PirexGames.RexPool"
     ],
     "includePlatforms": [],

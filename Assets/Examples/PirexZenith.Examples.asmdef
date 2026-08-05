@@ -2,8 +2,7 @@
     "name": "PirexZenith.Examples",
     "rootNamespace": "PirexZenith.Examples",
     "references": [
-        "PirexZenith.Core",
-        "PirexZenith.Unity"
+        "PirexZenith"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

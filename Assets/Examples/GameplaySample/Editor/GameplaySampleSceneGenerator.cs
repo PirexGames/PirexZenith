@@ -1,9 +1,7 @@
-#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 using System.Collections.Generic;
-using PirexZenith.Core;
-using PirexZenith.Editor;
-using PirexZenith.Unity;
-using UnityEditor;
+using PirexZenith;using PirexZenith.Editor;
+using PirexZenith;using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -16,7 +14,7 @@ namespace PirexZenith.Examples.GameplaySample.Editor
     /// </summary>
     public static class GameplaySampleSceneGenerator
     {
-        [MenuItem("Tools/Examples/🚀 Generate Gameplay Sample Scene & Prefab", false, 100)]
+        [MenuItem("Tools/Examples/ðŸš€ Generate Gameplay Sample Scene & Prefab", false, 100)]
         public static void GenerateGameplaySample()
         {
             // 1. Validate and create required directory structures
@@ -87,9 +85,9 @@ namespace PirexZenith.Examples.GameplaySample.Editor
             EditorUtility.DisplayDialog(
                 "PirexZenith - One-Click Example Generator",
                 $"Successfully generated Gameplay Sample scene!\n\n" +
-                $"📦 Prefab: {prefabPath}\n" +
-                $"🎬 Scene: {scenePath}\n\n" +
-                $"⚡ Auto-Bake pre-populated {bakeCount} target(s) into LifetimeScope.\n" +
+                $"ðŸ“¦ Prefab: {prefabPath}\n" +
+                $"ðŸŽ¬ Scene: {scenePath}\n\n" +
+                $"âš¡ Auto-Bake pre-populated {bakeCount} target(s) into LifetimeScope.\n" +
                 $"You can press PLAY immediately to test!",
                 "Awesome!");
         }

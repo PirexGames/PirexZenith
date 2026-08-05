@@ -1,6 +1,6 @@
-using System;
+﻿using System;
 
-namespace PirexZenith.Core
+namespace PirexZenith
 {
     /// <summary>
     /// Specialized exception thrown by PirexZenith (dependency cycles, missing bindings, etc.).

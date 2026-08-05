@@ -1,4 +1,4 @@
-namespace PirexZenith.Core
+﻿namespace PirexZenith
 {
     /// <summary>
     /// Specifies the lifetime of a service registered in a DIContainer.

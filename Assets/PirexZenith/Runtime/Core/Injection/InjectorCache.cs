@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Linq.Expressions;
 
-namespace PirexZenith.Core
+namespace PirexZenith
 {
     /// <summary>
     /// Manages and caches dependency injection delegates for each Type.
