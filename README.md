@@ -70,10 +70,7 @@ public class GameInstaller : MonoInstaller
         // 3. Instance: Bind an existing ScriptableObject or scene MonoBehaviour
         builder.RegisterInstance(_gameConfig);
 
-        // 4. Pure C# System: Automatically binds IInitializable, ITickable, IDisposable
-        builder.RegisterSystem<GameplayScoreSystem>();
-
-        // 5. Custom Factory: Dynamic creation logic
+        // 4. Custom Factory: Dynamic creation logic
         builder.RegisterFactory<EnemyAI>(container => new EnemyAI(container.Resolve<IAudioService>()));
     }
 }

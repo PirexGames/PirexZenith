@@ -46,7 +46,7 @@ namespace PirexZenith.Editor.Migration
         private string _statusMessage = "Select a tab above and click 'Scan Project' to detect VContainer files.";
         private MessageType _statusType = MessageType.Info;
 
-        [MenuItem("Tools/PirexZenith/🛠️ VContainer to PirexZenith Migrator", false, 100)]
+        [MenuItem("Tools/UnityPrime/PirexZenith/🛠️ VContainer to PirexZenith Migrator", false, 100)]
         public static void ShowWindow()
         {
             var window = GetWindow<VContainerToPirexZenithMigrator>("VContainer ➔ PirexZenith Migrator");
