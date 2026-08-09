@@ -80,7 +80,7 @@ namespace PirexZenith
         }
 
         /// <summary>
-        /// Core take â€” O(1) amortized when RexPool is present. Automatically injects dependencies into newly created instances.
+        /// Core take — O(1) amortized when RexPool is present. Automatically injects dependencies into newly created instances.
         /// </summary>
         public static GameObject TakeRPO(
             this DIContainer container,
@@ -91,7 +91,7 @@ namespace PirexZenith
         }
 
         /// <summary>
-        /// Core take at a specified position and rotation â€” O(1) amortized when RexPool is present.
+        /// Core take at a specified position and rotation — O(1) amortized when RexPool is present.
         /// </summary>
         public static GameObject TakeRPO(
             this DIContainer container,

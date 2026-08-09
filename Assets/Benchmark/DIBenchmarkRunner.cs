@@ -74,7 +74,7 @@ namespace PirexZenith.Editor.Benchmark
         private Vector2 _scrollPos;
         private bool _isRunning = false;
 
-        [MenuItem("Tools/PirexZenith/ðŸ Run 3-Way DI Benchmark")]
+        [MenuItem("Tools/PirexZenith/🏁 Run 3-Way DI Benchmark")]
         public static void ShowWindow()
         {
             var win = GetWindow<DIBenchmarkRunner>("DI 3-Way Benchmark");
@@ -85,13 +85,13 @@ namespace PirexZenith.Editor.Benchmark
         private void OnGUI()
         {
             GUILayout.Space(10);
-            GUILayout.Label("ðŸ PirexZenith vs. VContainer vs. Reflex Performance Benchmark", EditorStyles.boldLabel);
+            GUILayout.Label("🏁 PirexZenith vs. VContainer vs. Reflex Performance Benchmark", EditorStyles.boldLabel);
             GUILayout.Label("Scientific comparison measuring Execution Time (ms) & GC Allocation (Bytes).", EditorStyles.miniLabel);
             GUILayout.Space(10);
 
             EditorGUILayout.BeginHorizontal(EditorStyles.helpBox);
             GUILayout.Label("Libraries Status:", EditorStyles.boldLabel, GUILayout.Width(120));
-            GUILayout.Label("ðŸ‘‘ PirexZenith: Ready (O(1) Pre-baked)");
+            GUILayout.Label("👑 PirexZenith: Ready (O(1) Pre-baked)");
 
 #if PIREX_VCONTAINER_ENABLED
             GUILayout.Label("VContainer: Installed", EditorStyles.boldLabel);
@@ -109,7 +109,7 @@ namespace PirexZenith.Editor.Benchmark
             GUILayout.Space(15);
 
             GUI.enabled = !_isRunning;
-            if (GUILayout.Button("â–¶ RUN FULL BENCHMARK SUITE (4 TESTS)", GUILayout.Height(35)))
+            if (GUILayout.Button("▶ RUN FULL BENCHMARK SUITE (4 TESTS)", GUILayout.Height(35)))
             {
                 RunBenchmarks();
             }
@@ -119,7 +119,7 @@ namespace PirexZenith.Editor.Benchmark
 
             if (_results.Count > 0)
             {
-                GUILayout.Label("ðŸ“Š Benchmark Results Summary:", EditorStyles.boldLabel);
+                GUILayout.Label("📊 Benchmark Results Summary:", EditorStyles.boldLabel);
                 _scrollPos = EditorGUILayout.BeginScrollView(_scrollPos);
 
                 DrawResultHeader();
@@ -131,7 +131,7 @@ namespace PirexZenith.Editor.Benchmark
                 EditorGUILayout.EndScrollView();
 
                 GUILayout.Space(10);
-                if (GUILayout.Button("ðŸ“‹ Log Markdown Comparison Table to Console"))
+                if (GUILayout.Button("📋 Log Markdown Comparison Table to Console"))
                 {
                     LogMarkdownTable();
                 }
@@ -142,7 +142,7 @@ namespace PirexZenith.Editor.Benchmark
         {
             EditorGUILayout.BeginHorizontal("box");
             GUILayout.Label("Test Name", EditorStyles.boldLabel, GUILayout.Width(190));
-            GUILayout.Label("ðŸ‘‘ PirexZenith", EditorStyles.boldLabel, GUILayout.Width(175));
+            GUILayout.Label("👑 PirexZenith", EditorStyles.boldLabel, GUILayout.Width(175));
             GUILayout.Label("VContainer", EditorStyles.boldLabel, GUILayout.Width(175));
             GUILayout.Label("Reflex", EditorStyles.boldLabel, GUILayout.Width(175));
             EditorGUILayout.EndHorizontal();
@@ -192,7 +192,7 @@ namespace PirexZenith.Editor.Benchmark
         {
             var res = new BenchResult { TestName = "1. Container Build (100 Svc)" };
 
-            // ðŸ‘‘ PirexZenith
+            // 👑 PirexZenith
             Measure(() =>
             {
                 var builder = new PirexZenith.ContainerBuilder();
@@ -227,7 +227,7 @@ namespace PirexZenith.Editor.Benchmark
         {
             var res = new BenchResult { TestName = "2. 50,000x Transient Resolve" };
 
-            // ðŸ‘‘ PirexZenith
+            // 👑 PirexZenith
             {
                 var builder = new PirexZenith.ContainerBuilder();
                 builder.RegisterTransient<BenchServiceA>();
@@ -283,7 +283,7 @@ namespace PirexZenith.Editor.Benchmark
         {
             var res = new BenchResult { TestName = "3. 100,000x Singleton Resolve" };
 
-            // ðŸ‘‘ PirexZenith
+            // 👑 PirexZenith
             {
                 var builder = new PirexZenith.ContainerBuilder();
                 builder.RegisterSingleton<BenchSingleton, IBenchSingleton>();
@@ -341,7 +341,7 @@ namespace PirexZenith.Editor.Benchmark
 
             List<GameObject> created = new List<GameObject>(5000);
 
-            // ðŸ‘‘ PirexZenith
+            // 👑 PirexZenith
             {
                 var builder = new PirexZenith.ContainerBuilder();
                 builder.RegisterSingleton<BenchServiceA>();
@@ -421,7 +421,7 @@ namespace PirexZenith.Editor.Benchmark
         {
             var res = new BenchResult { TestName = "5. 20,000x Deep Tree (5-Level A->E)" };
 
-            // ðŸ‘‘ PirexZenith
+            // 👑 PirexZenith
             {
                 var builder = new PirexZenith.ContainerBuilder();
                 builder.RegisterTransient<BenchServiceA>();
@@ -483,7 +483,7 @@ namespace PirexZenith.Editor.Benchmark
         {
             var res = new BenchResult { TestName = "6. 10,000x ResolveAll<T> (Multi-Bind)" };
 
-            // ðŸ‘‘ PirexZenith
+            // 👑 PirexZenith
             {
                 var builder = new PirexZenith.ContainerBuilder();
                 builder.RegisterTransient<BenchMulti1, IBenchMultiService>();
@@ -568,9 +568,9 @@ namespace PirexZenith.Editor.Benchmark
         private void LogMarkdownTable()
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine("### ðŸ 3-Way DI Performance Benchmark Results (PirexZenith vs VContainer vs Reflex)");
+            sb.AppendLine("### 🏁 3-Way DI Performance Benchmark Results (PirexZenith vs VContainer vs Reflex)");
             sb.AppendLine();
-            sb.AppendLine("| Test Name | ðŸ‘‘ PirexZenith (ms / GC / Gen0) | VContainer (ms / GC / Gen0) | Reflex (ms / GC / Gen0) |");
+            sb.AppendLine("| Test Name | 👑 PirexZenith (ms / GC / Gen0) | VContainer (ms / GC / Gen0) | Reflex (ms / GC / Gen0) |");
             sb.AppendLine("| :--- | :---: | :---: | :---: |");
 
             foreach (var res in _results)

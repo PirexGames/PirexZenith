@@ -1,14 +1,14 @@
-﻿<div align="center">
-  ðŸŒ <strong>Language / NgÃ´n ngá»¯:</strong> <a href="#-english-documentation">English</a> | <a href="#-tÃ i-liá»‡u-tiáº¿ng-viá»‡t">Tiáº¿ng Viá»‡t</a>
+<div align="center">
+  🌐 <strong>Language / Ngôn ngữ:</strong> <a href="#-english-documentation">English</a> | <a href="#-tài-liệu-tiếng-việt">Tiếng Việt</a>
 </div>
 
 ---
 
-# ðŸ‡¬ðŸ‡§ English Documentation
+# 🇬🇧 English Documentation
 
 <div align="center">
 
-# ðŸ‘‘ PirexZenith
+# 👑 PirexZenith
 ### The Peak of Fast, Zero-Config & Convenient Unity Dependency Injection
 
 [![Unity Version](https://img.shields.io/badge/Unity-2021.3%2B-blue.svg)](https://unity.com/)
@@ -22,9 +22,9 @@
 
 ---
 
-## ðŸŒŸ Why PirexZenith?
+## 🌟 Why PirexZenith?
 
-| Feature | Zenject / Extenject | VContainer | ðŸ‘‘ **PirexZenith** |
+| Feature | Zenject / Extenject | VContainer | 👑 **PirexZenith** |
 | :--- | :--- | :--- | :--- |
 | **MonoBehaviour DI Workflow** | Automatic via SceneContext | Requires manual binding (`RegisterComponentInHierarchy`) | **Zero-Config (Auto-Bakes on Save)** |
 | **Runtime Performance** | Slow (Runtime Reflection) | Blazing Fast (CodeGen / IL) | **Blazing Fast (O(1) Pre-baked Targets)** |
@@ -32,12 +32,24 @@
 | **Editor Wiring Effort** | Heavy manual drag & drop | Manual registration required in Installers | **100% Automated (`Ctrl + S`)** |
 | **Missing Data Fallback** | Crashes / Null Reference | Crashes if ungenerated or unregistered | **Bulletproof Runtime Fallback** |
 
+### 🚀 Performance Benchmark
+*Measured on Unity 2022.3 (Mono/IL2CPP). Lower time is better.*
+
+| Test Name | 👑 PirexZenith | VContainer | Reflex |
+| :--- | :--- | :--- | :--- |
+| **1. Container Build** (100 Svc) | **0.07ms \| 0 B \| GC:0** 🏆 | 0.39ms \| 0 B \| GC:0 | 0.12ms \| 0 B \| GC:0 |
+| **2. 50,000x Transient Resolve** | **25.48ms \| 0 B \| GC:0** 🏆 | 144.62ms \| 0 B \| GC:0 | 93.60ms \| 0 B \| GC:0 |
+| **3. 100,000x Singleton Resolve** | **13.34ms \| 0 B \| GC:0** 🏆 | 16.20ms \| 0 B \| GC:0 | 20.18ms \| 0 B \| GC:0 |
+| **4. 5,000x GameObject DI Inject** | **93.99ms \| 0 B \| GC:0** 🏆 | 108.18ms \| 0 B \| GC:0 | 97.21ms \| 0 B \| GC:0 |
+| **5. 20,000x Deep Tree** (5-Level) | **18.79ms \| 0 B \| GC:0** 🏆 | 101.05ms \| 0 B \| GC:0 | 61.01ms \| 0 B \| GC:0 |
+| **6. 10,000x ResolveAll\<T>** (Multi-Bind) | **5.17ms \| 0 B \| GC:0** 🏆 | 30.72ms \| 0 B \| GC:0 | 17.64ms \| 0 B \| GC:0 |
+
 ---
 
-## ðŸ“¦ Installation
+## 📦 Installation
 
 ### Via Unity Package Manager (Git URL)
-1. Open Unity Editor and navigate to **Window âž” Package Manager**.
+1. Open Unity Editor and navigate to **Window ➔ Package Manager**.
 2. Click the **`+`** button in the top left and select **Add package from git URL...**.
 3. Enter the repository URL:
    ```text
@@ -48,7 +60,7 @@
 
 ---
 
-## ðŸ“š Complete Feature Guide & Code Examples
+## 📚 Complete Feature Guide & Code Examples
 
 ### 1. Registering Bindings in Installers
 PirexZenith supports Singleton, Transient, Instance, Pure C# System, and Factory bindings:
@@ -198,19 +210,19 @@ public class GameplaySceneScope : LifetimeScope
 ### 8. Editor Tools & One-Click Example Generator
 Test PirexZenith instantly in Unity Editor by navigating to:
 ```text
-Tools âž” Examples âž” ðŸš€ Generate Gameplay Sample Scene & Prefab
+Tools ➔ Examples ➔ 🚀 Generate Gameplay Sample Scene & Prefab
 ```
 This generates a fully configured scene (`GameplaySampleScene.unity`) and pooled prefab (`EnemyPrefab.prefab`) in 1 second. Press **PLAY** to test!
 
 ---
 ---
 
-# ðŸ‡»ðŸ‡³ TÃ i Liá»‡u Tiáº¿ng Viá»‡t
+# 🇻🇳 Tài Liệu Tiếng Việt
 
 <div align="center">
 
-# ðŸ‘‘ PirexZenith
-### ThÆ° viá»‡n Dependency Injection & Object Pooling Tá»‘c Äá»™ Cao Cho Unity
+# 👑 PirexZenith
+### Thư viện Dependency Injection & Object Pooling Tốc Độ Cao Cho Unity
 
 [![Unity Version](https://img.shields.io/badge/Unity-2021.3%2B-blue.svg)](https://unity.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
@@ -219,40 +231,52 @@ This generates a fully configured scene (`GameplaySampleScene.unity`) and pooled
 
 </div>
 
-**PirexZenith** lÃ  thÆ° viá»‡n Dependency Injection vÃ  Object Pooling Ä‘áº³ng cáº¥p AAA do **PirexGames** phÃ¡t triá»ƒn, mang trá»n váº¹n triáº¿t lÃ½ káº¿t há»£p **sá»± tiá»‡n lá»£i tuyá»‡t Ä‘á»‘i cá»§a Zenject** vÃ  **tá»‘c Ä‘á»™ thá»±c thi cá»±c Ä‘á»™ cá»§a VContainer**.
+**PirexZenith** là thư viện Dependency Injection và Object Pooling đẳng cấp AAA do **PirexGames** phát triển, mang trọn vẹn triết lý kết hợp **sự tiện lợi tuyệt đối của Zenject** và **tốc độ thực thi cực độ của VContainer**.
 
 ---
 
-## ðŸŒŸ Táº¡i sao chá»n PirexZenith?
+## 🌟 Tại sao chọn PirexZenith?
 
-| TiÃªu chÃ­ | Zenject / Extenject | VContainer | ðŸ‘‘ **PirexZenith** |
+| Tiêu chí | Zenject / Extenject | VContainer | 👑 **PirexZenith** |
 | :--- | :--- | :--- | :--- |
-| **Quy trÃ¬nh DI MonoBehaviour** | Tá»± Ä‘á»™ng qua SceneContext | Pháº£i Ä‘Äƒng kÃ½ tay (`RegisterComponentInHierarchy`) | **Zero-Config (Tá»± Ä‘á»™ng Bake khi Save)** |
-| **Tá»‘c Ä‘á»™ Runtime** | Cháº­m (Reflection Runtime) | Cá»±c nhanh (CodeGen / IL) | **Cá»±c nhanh (O(1) Pre-baked Targets)** |
-| **DI cho Prefab & Pool** | Custom Memory Pool API | `resolver.Instantiate` / Factory cáº¥u hÃ¬nh tay | **TÃ­ch há»£p RexPool O(1) + DIPrefabCache** |
-| **CÃ´ng sá»©c thiáº¿t láº­p Editor** | KÃ©o tháº£ thá»§ cÃ´ng nhiá»u | Pháº£i khai bÃ¡o thá»§ cÃ´ng trong Installer | **Tá»± Ä‘á»™ng 100% khi Save (`Ctrl + S`)** |
-| **Chá»‘ng lá»—i gÃ£y game** | Null Reference náº¿u quÃªn bind | Lá»—i náº¿u chÆ°a generate hoáº·c chÆ°a Ä‘Äƒng kÃ½ | **Bulletproof Fallback tá»± Ä‘á»™ng** |
+| **Quy trình DI MonoBehaviour** | Tự động qua SceneContext | Phải đăng ký tay (`RegisterComponentInHierarchy`) | **Zero-Config (Tự động Bake khi Save)** |
+| **Tốc độ Runtime** | Chậm (Reflection Runtime) | Cực nhanh (CodeGen / IL) | **Cực nhanh (O(1) Pre-baked Targets)** |
+| **DI cho Prefab & Pool** | Custom Memory Pool API | `resolver.Instantiate` / Factory cấu hình tay | **Tích hợp RexPool O(1) + DIPrefabCache** |
+| **Công sức thiết lập Editor** | Kéo thả thủ công nhiều | Phải khai báo thủ công trong Installer | **Tự động 100% khi Save (`Ctrl + S`)** |
+| **Chống lỗi gãy game** | Null Reference nếu quên bind | Lỗi nếu chưa generate hoặc chưa đăng ký | **Bulletproof Fallback tự động** |
+
+### 🚀 Bảng đo lường hiệu năng (Benchmark)
+*Đo trên Unity 2022.3 (Mono/IL2CPP). Thời gian càng thấp càng tốt.*
+
+| Tên bài test | 👑 PirexZenith | VContainer | Reflex |
+| :--- | :--- | :--- | :--- |
+| **1. Container Build** (100 Svc) | **0.07ms \| 0 B \| GC:0** 🏆 | 0.39ms \| 0 B \| GC:0 | 0.12ms \| 0 B \| GC:0 |
+| **2. 50,000x Transient Resolve** | **25.48ms \| 0 B \| GC:0** 🏆 | 144.62ms \| 0 B \| GC:0 | 93.60ms \| 0 B \| GC:0 |
+| **3. 100,000x Singleton Resolve** | **13.34ms \| 0 B \| GC:0** 🏆 | 16.20ms \| 0 B \| GC:0 | 20.18ms \| 0 B \| GC:0 |
+| **4. 5,000x GameObject DI Inject** | **93.99ms \| 0 B \| GC:0** 🏆 | 108.18ms \| 0 B \| GC:0 | 97.21ms \| 0 B \| GC:0 |
+| **5. 20,000x Deep Tree** (5-Level) | **18.79ms \| 0 B \| GC:0** 🏆 | 101.05ms \| 0 B \| GC:0 | 61.01ms \| 0 B \| GC:0 |
+| **6. 10,000x ResolveAll\<T>** (Multi-Bind) | **5.17ms \| 0 B \| GC:0** 🏆 | 30.72ms \| 0 B \| GC:0 | 17.64ms \| 0 B \| GC:0 |
 
 ---
 
-## ðŸ“¦ HÆ°á»›ng dáº«n cÃ i Ä‘áº·t
+## 📦 Hướng dẫn cài đặt
 
-### CÃ i Ä‘áº·t qua Unity Package Manager (Git URL)
-1. Má»Ÿ Unity Editor, vÃ o **Window âž” Package Manager**.
-2. Báº¥m nÃºt **`+`** á»Ÿ gÃ³c trÃªn bÃªn trÃ¡i vÃ  chá»n **Add package from git URL...**.
-3. DÃ¡n Ä‘Æ°á»ng dáº«n repository:
+### Cài đặt qua Unity Package Manager (Git URL)
+1. Mở Unity Editor, vào **Window ➔ Package Manager**.
+2. Bấm nút **`+`** ở góc trên bên trái và chọn **Add package from git URL...**.
+3. Dán đường dẫn repository:
    ```text
    https://github.com/PirexGames/PirexZenith.git
    ```
 
-*(TÃ¹y chá»n)* Äá»ƒ kÃ­ch hoáº¡t tÃ­nh nÄƒng Object Pooling khÃ´ng tá»‘n GC allocation, hÃ£y cÃ i Ä‘áº·t gÃ³i **`PirexGames.RexPool`**. PirexZenith sáº½ tá»± Ä‘á»™ng nháº­n diá»‡n vÃ  má»Ÿ khÃ³a cÃ¡c hÃ m má»Ÿ rá»™ng Pooling DI.
+*(Tùy chọn)* Để kích hoạt tính năng Object Pooling không tốn GC allocation, hãy cài đặt gói **`PirexGames.RexPool`**. PirexZenith sẽ tự động nhận diện và mở khóa các hàm mở rộng Pooling DI.
 
 ---
 
-## ðŸ“š HÆ°á»›ng dáº«n toÃ n táº­p tÃ­nh nÄƒng & VÃ­ dá»¥ mÃ£ nguá»“n
+## 📚 Hướng dẫn toàn tập tính năng & Ví dụ mã nguồn
 
-### 1. CÃ¡c kiá»ƒu Ä‘Äƒng kÃ½ Binding trong Installer
-Há»— trá»£ Ä‘áº§y Ä‘á»§ Singleton, Transient, Instance, Pure C# System vÃ  Factory binding:
+### 1. Các kiểu đăng ký Binding trong Installer
+Hỗ trợ đầy đủ Singleton, Transient, Instance, Pure C# System và Factory binding:
 ```csharp
 using PirexZenith;using UnityEngine;
 
@@ -262,19 +286,19 @@ public class GameInstaller : MonoInstaller
 
     public override void InstallBindings(ContainerBuilder builder) 
     {
-        // 1. Singleton: Chá»‰ táº¡o 1 instance duy nháº¥t chia sáº» toÃ n bá»™ container
+        // 1. Singleton: Chỉ tạo 1 instance duy nhất chia sẻ toàn bộ container
         builder.RegisterSingleton<AudioService, IAudioService>();
 
-        // 2. Transient: Táº¡o má»›i 1 instance má»—i khi Ä‘Æ°á»£c gá»i Resolve hoáº·c Inject
+        // 2. Transient: Tạo mới 1 instance mỗi khi được gọi Resolve hoặc Inject
         builder.RegisterTransient<PlayerStats>();
 
-        // 3. Instance: ÄÄƒng kÃ½ má»™t ScriptableObject hoáº·c MonoBehaviour cÃ³ sáºµn
+        // 3. Instance: Đăng ký một ScriptableObject hoặc MonoBehaviour có sẵn
         builder.RegisterInstance(_gameConfig);
 
-        // 4. Pure C# System: Tá»± Ä‘á»™ng bind cÃ¡c interface IInitializable, ITickable, IDisposable
+        // 4. Pure C# System: Tự động bind các interface IInitializable, ITickable, IDisposable
         builder.RegisterSystem<GameplayScoreSystem>();
 
-        // 5. Custom Factory: ÄÄƒng kÃ½ logic táº¡o object tÃ¹y biáº¿n
+        // 5. Custom Factory: Đăng ký logic tạo object tùy biến
         builder.RegisterFactory<EnemyAI>(container => new EnemyAI(container.Resolve<IAudioService>()));
     }
 }
@@ -282,8 +306,8 @@ public class GameInstaller : MonoInstaller
 
 ---
 
-### 2. 4 Kiá»ƒu tiÃªm Dependency (MonoBehaviour & Class C#)
-Há»— trá»£ tiÃªm qua Constructor, Field, Property vÃ  Method trÃªn cáº£ MonoBehaviour láº«n class C# thÆ°á»ng:
+### 2. 4 Kiểu tiêm Dependency (MonoBehaviour & Class C#)
+Hỗ trợ tiêm qua Constructor, Field, Property và Method trên cả MonoBehaviour lẫn class C# thường:
 ```csharp
 using PirexZenith;using UnityEngine;
 
@@ -297,7 +321,7 @@ public class PlayerController : MonoBehaviour
 
     private IBattleRuleService _battleRule;
 
-    // 3. Method Injection (ÄÆ°á»£c gá»i tá»± Ä‘á»™ng sau khi khá»Ÿi táº¡o)
+    // 3. Method Injection (Được gọi tự động sau khi khởi tạo)
     [Inject]
     public void Construct(IBattleRuleService battleRule)
     {
@@ -313,13 +337,13 @@ public class PlayerController : MonoBehaviour
 
 ---
 
-### 3. Há»‡ thá»‘ng vÃ²ng Ä‘á»i C# thuáº§n (Pure C# Lifecycle Systems)
-Viáº¿t game logic hiá»‡u nÄƒng cao báº±ng lá»›p C# thuáº§n, khÃ´ng cáº§n káº¿ thá»«a `MonoBehaviour` mÃ  váº«n tham gia vÃ²ng Ä‘á»i Unity:
-* `IInitializable`: `Initialize()` cháº¡y 1 láº§n khi Scope báº¯t Ä‘áº§u.
-* `ITickable`: `Tick()` cháº¡y má»—i frame trong `Update()`.
-* `IFixedTickable`: `FixedTick()` cháº¡y trong `FixedUpdate()`.
-* `ILateTickable`: `LateTick()` cháº¡y trong `LateUpdate()`.
-* `IDisposable`: `Dispose()` tá»± Ä‘á»™ng dá»n dáº¹p khi Scope há»§y.
+### 3. Hệ thống vòng đời C# thuần (Pure C# Lifecycle Systems)
+Viết game logic hiệu năng cao bằng lớp C# thuần, không cần kế thừa `MonoBehaviour` mà vẫn tham gia vòng đời Unity:
+* `IInitializable`: `Initialize()` chạy 1 lần khi Scope bắt đầu.
+* `ITickable`: `Tick()` chạy mỗi frame trong `Update()`.
+* `IFixedTickable`: `FixedTick()` chạy trong `FixedUpdate()`.
+* `ILateTickable`: `LateTick()` chạy trong `LateUpdate()`.
+* `IDisposable`: `Dispose()` tự động dọn dẹp khi Scope hủy.
 
 ```csharp
 using PirexZenith;using PirexZenith;using UnityEngine;
@@ -328,7 +352,7 @@ public class GameplayScoreSystem : IInitializable, ITickable, IDisposable
 {
     private readonly IAudioService _audioService;
 
-    // 4. Constructor Injection (Æ¯u tiÃªn constructor gáº¯n tháº» [Inject])
+    // 4. Constructor Injection (Ưu tiên constructor gắn thẻ [Inject])
     [Inject]
     public GameplayScoreSystem(IAudioService audioService)
     {
@@ -336,20 +360,20 @@ public class GameplayScoreSystem : IInitializable, ITickable, IDisposable
     }
 
     public void Initialize() => Debug.Log("System initialized!");
-    public void Tick() { /* Cháº¡y má»—i frame */ }
-    public void Dispose() { /* Dá»n dáº¹p tÃ i nguyÃªn */ }
+    public void Tick() { /* Chạy mỗi frame */ }
+    public void Dispose() { /* Dọn dẹp tài nguyên */ }
 }
 ```
 
 ---
 
-### 4. TiÃªm vÃ o Class C# bÃ¬nh thÆ°á»ng (Non-MonoBehaviour)
-Báº¡n cÃ³ thá»ƒ Ä‘á»ƒ Container tá»± táº¡o object (`Resolve<T>`) hoáº·c tiÃªm vÃ o object C# bÃ¬nh thÆ°á»ng do báº¡n tá»± táº¡o:
+### 4. Tiêm vào Class C# bình thường (Non-MonoBehaviour)
+Bạn có thể để Container tự tạo object (`Resolve<T>`) hoặc tiêm vào object C# bình thường do bạn tự tạo:
 ```csharp
-// CÃ¡ch 1 (KhuyÃªn dÃ¹ng): Resolve tá»« Container (Tá»± táº¡o má»›i vÃ  Inject trá»n váº¹n Constructor/Field/Property/Method)
+// Cách 1 (Khuyên dùng): Resolve từ Container (Tự tạo mới và Inject trọn vẹn Constructor/Field/Property/Method)
 var ai = _container.Resolve<EnemyAIController>();
 
-// CÃ¡ch 2: TiÃªm vÃ o má»™t object C# bÃ¬nh thÆ°á»ng Ä‘Ã£ Ä‘Æ°á»£c new sáºµn
+// Cách 2: Tiêm vào một object C# bình thường đã được new sẵn
 var myNormalObj = new EnemyAIController();
 _container.Inject(myNormalObj);
 ```
@@ -357,40 +381,40 @@ _container.Inject(myNormalObj);
 ---
 
 ### 5. Zero-Config Auto-Baking (Scene & Prefab)
-**Báº¡n KHÃ”NG BAO GIá»œ pháº£i Ä‘Äƒng kÃ½ tay MonoBehaviour hay kÃ©o tháº£ list target!**
+**Bạn KHÔNG BAO GIỜ phải đăng ký tay MonoBehaviour hay kéo thả list target!**
 * **Khi Save Prefab (`Ctrl+S`):**
-  * Náº¿u Prefab chá»©a script mang tháº» `[Inject]`, há»‡ thá»‘ng `PrefabBakingSystem` tá»± Ä‘á»™ng gáº¯n `DIPrefabCache` vÃ  náº¡p danh sÃ¡ch target vá»›i tá»‘c Ä‘á»™ O(1).
+  * Nếu Prefab chứa script mang thẻ `[Inject]`, hệ thống `PrefabBakingSystem` tự động gắn `DIPrefabCache` và nạp danh sách target với tốc độ O(1).
 * **Khi Save Scene (`Ctrl+S`):**
-  * Náº¿u Scene chá»©a script mang tháº» `[Inject]` nhÆ°ng chÆ°a cÃ³ Scope, há»‡ thá»‘ng `DIEditorScanner` tá»± Ä‘á»™ng táº¡o `--- PIREX_DI_SCOPE ---` gáº¯n `LifetimeScope` vÃ  náº¡p sáºµn target.
-* **Bake toÃ n bá»™ Prefab:** Menu **`Tools -> PirexZenith -> Bake All Prefabs in Project`** tá»± Ä‘á»™ng quÃ©t vÃ  Bake táº¥t cáº£ Prefab trong dá»± Ã¡n chá»‰ vá»›i 1 click.
+  * Nếu Scene chứa script mang thẻ `[Inject]` nhưng chưa có Scope, hệ thống `DIEditorScanner` tự động tạo `--- PIREX_DI_SCOPE ---` gắn `LifetimeScope` và nạp sẵn target.
+* **Bake toàn bộ Prefab:** Menu **`Tools -> PirexZenith -> Bake All Prefabs in Project`** tự động quét và Bake tất cả Prefab trong dự án chỉ với 1 click.
 
 ---
 
-### 6. Object Pooling 0-GC káº¿t há»£p DI (TÃ­ch há»£p RexPool)
-Cung cáº¥p cÃ¡c hÃ m má»Ÿ rá»™ng trá»±c tiáº¿p trÃªn `DIContainer` vá»›i chá»¯ kÃ½ hÃ m giá»‘ng há»‡t `RexPoolManager`, báº£o vá»‡ báº±ng cá» `IsInjected` tá»‘c Ä‘á»™ O(1):
+### 6. Object Pooling 0-GC kết hợp DI (Tích hợp RexPool)
+Cung cấp các hàm mở rộng trực tiếp trên `DIContainer` với chữ ký hàm giống hệt `RexPoolManager`, bảo vệ bằng cờ `IsInjected` tốc độ O(1):
 ```csharp
 // 1. Pre-warm 10 object trong pool
 _container.Prepair(_enemyPrefab, 10);
 
-// 2. Take tá»« pool (Tá»± Ä‘á»™ng bá» qua reflection DI náº¿u object tÃ¡i sá»­ dá»¥ng Ä‘Ã£ Ä‘Æ°á»£c inject trÆ°á»›c Ä‘Ã³)
+// 2. Take từ pool (Tự động bỏ qua reflection DI nếu object tái sử dụng đã được inject trước đó)
 GameObject enemy = _container.Take(_enemyPrefab, spawnPosition, spawnRotation);
 
-// 3. Thu há»“i object vá» pool
+// 3. Thu hồi object về pool
 _container.CleanUp(_enemyPrefab);
 ```
-*(LÆ°u Ã½: Náº¿u khÃ´ng cÃ i RexPool, cÃ¡c hÃ m nÃ y tá»± Ä‘á»™ng fallback sang `Object.Instantiate` cá»§a Unity mÃ  khÃ´ng bÃ¡o lá»—i.)*
+*(Lưu ý: Nếu không cài RexPool, các hàm này tự động fallback sang `Object.Instantiate` của Unity mà không báo lỗi.)*
 
 ---
 
-### 7. Cáº¥u trÃºc Scope, Ghi Ä‘Ã¨ Service & Tra cá»©u cha con (`nameof`)
-PirexZenith sá»­ dá»¥ng **`LifetimeScope`** lÃ m component duy nháº¥t quáº£n lÃ½ Container cho má»i cáº¥p Ä‘á»™ (Project, Scene, Prefab, UI Modal).
-TrÃªn cá»­a sá»• Inspector cá»§a **`LifetimeScope`**, menu dropdown **Parent Scope Class** há»— trá»£ 3 cháº¿ Ä‘á»™:
-1. `[ Auto / Inherit Active Parent Scope ]` **(Máº·c Ä‘á»‹nh):** Tá»± Ä‘á»™ng káº¿ thá»«a Scope cha Ä‘ang cháº¡y gáº§n nháº¥t.
-2. `[ None / Standalone Scope ]`: Hoáº¡t Ä‘á»™ng Ä‘á»™c láº­p hoÃ n toÃ n.
-3. `nameof(ParentScopeClass)`: Káº¿t ná»‘i tá»›i lá»›p Scope chá»‰ Ä‘á»‹nh (`nameof(CoreSceneScope)`), an toÃ n tuyá»‡t Ä‘á»‘i khi Ä‘á»•i tÃªn báº±ng IDE Refactor.
+### 7. Cấu trúc Scope, Ghi đè Service & Tra cứu cha con (`nameof`)
+PirexZenith sử dụng **`LifetimeScope`** làm component duy nhất quản lý Container cho mọi cấp độ (Project, Scene, Prefab, UI Modal).
+Trên cửa sổ Inspector của **`LifetimeScope`**, menu dropdown **Parent Scope Class** hỗ trợ 3 chế độ:
+1. `[ Auto / Inherit Active Parent Scope ]` **(Mặc định):** Tự động kế thừa Scope cha đang chạy gần nhất.
+2. `[ None / Standalone Scope ]`: Hoạt động độc lập hoàn toàn.
+3. `nameof(ParentScopeClass)`: Kết nối tới lớp Scope chỉ định (`nameof(CoreSceneScope)`), an toàn tuyệt đối khi đổi tên bằng IDE Refactor.
 
 ```csharp
-// VÃ­ dá»¥: GameplaySceneScope káº¿ thá»«a Service tá»« CoreSceneScope vÃ  cÃ³ thá»ƒ Ä‘Äƒng kÃ½ ghi Ä‘Ã¨
+// Ví dụ: GameplaySceneScope kế thừa Service từ CoreSceneScope và có thể đăng ký ghi đè
 public class GameplaySceneScope : LifetimeScope
 {
     public override string ParentScopeName => nameof(CoreSceneScope);
@@ -399,9 +423,9 @@ public class GameplaySceneScope : LifetimeScope
 
 ---
 
-### 8. CÃ´ng cá»¥ Editor & One-Click Example Generator
-Tráº£i nghiá»‡m ngay trong Unity Editor báº±ng cÃ¡ch vÃ o menu:
+### 8. Công cụ Editor & One-Click Example Generator
+Trải nghiệm ngay trong Unity Editor bằng cách vào menu:
 ```text
-Tools âž” Examples âž” ðŸš€ Generate Gameplay Sample Scene & Prefab
+Tools ➔ Examples ➔ 🚀 Generate Gameplay Sample Scene & Prefab
 ```
-Há»‡ thá»‘ng sáº½ tá»± Ä‘á»™ng táº¡o Scene máº«u (`GameplaySampleScene.unity`) vÃ  Prefab (`EnemyPrefab.prefab`) Ä‘Ã£ Ä‘Æ°á»£c káº¿t ná»‘i trá»n váº¹n DI & Object Pooling chá»‰ trong 1 giÃ¢y. Nháº¥n **PLAY** Ä‘á»ƒ kiá»ƒm thá»­ ngay!
+Hệ thống sẽ tự động tạo Scene mẫu (`GameplaySampleScene.unity`) và Prefab (`EnemyPrefab.prefab`) đã được kết nối trọn vẹn DI & Object Pooling chỉ trong 1 giây. Nhấn **PLAY** để kiểm thử ngay!
