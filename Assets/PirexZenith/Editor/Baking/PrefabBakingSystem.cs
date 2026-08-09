@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using PirexZenith;
 using UnityEditor;
@@ -121,26 +121,49 @@ namespace PirexZenith.Editor
 
             count = injectableTargets.Count;
 
-            // 3. Otherwise, automatically attach DIPrefabCache component to root if not already present
-            DIPrefabCache cache = prefabRoot.GetComponent<DIPrefabCache>();
-            if (cache == null)
+            // 3. Otherwise, automatically attach DIPrefabCache or InjectionScope based on preference
+            int autoBakeMode = EditorPrefs.GetInt(PirexZenithEditorWindow.PREF_AUTOBAKE_MODE, 0);
+
+            if (autoBakeMode == 1) // InjectionScope mode
             {
-                cache = prefabRoot.AddComponent<DIPrefabCache>();
-                componentAdded = true;
-            }
+                InjectionScope injectionScope = prefabRoot.GetComponent<InjectionScope>();
+                if (injectionScope == null)
+                {
+                    injectionScope = prefabRoot.AddComponent<InjectionScope>();
+                    componentAdded = true;
+                }
 
-            // 4. Verify whether the current cache is already identical (prevents infinite dirty loops)
-            if (!componentAdded && IsListIdentical(cache.CachedTargets, injectableTargets))
+                if (!componentAdded && IsListIdentical(injectionScope.bakedTargets, injectableTargets))
+                {
+                    return false;
+                }
+
+                injectionScope.bakedTargets = new List<MonoBehaviour>(injectableTargets);
+                EditorUtility.SetDirty(injectionScope);
+                EditorUtility.SetDirty(prefabRoot);
+                return true;
+            }
+            else // DIPrefabCache mode
             {
-                return false;
+                DIPrefabCache cache = prefabRoot.GetComponent<DIPrefabCache>();
+                if (cache == null)
+                {
+                    cache = prefabRoot.AddComponent<DIPrefabCache>();
+                    componentAdded = true;
+                }
+
+                // 4. Verify whether the current cache is already identical (prevents infinite dirty loops)
+                if (!componentAdded && IsListIdentical(cache.CachedTargets, injectableTargets))
+                {
+                    return false;
+                }
+
+                // 5. Update the target list in cache
+                cache.SetCachedTargets(injectableTargets);
+                EditorUtility.SetDirty(cache);
+                EditorUtility.SetDirty(prefabRoot);
+                return true;
             }
-
-            // 5. Update the target list in cache
-            cache.SetCachedTargets(injectableTargets);
-            EditorUtility.SetDirty(cache);
-            EditorUtility.SetDirty(prefabRoot);
-
-            return true;
         }
 
         private static bool IsListIdentical(List<MonoBehaviour> current, List<MonoBehaviour> target)

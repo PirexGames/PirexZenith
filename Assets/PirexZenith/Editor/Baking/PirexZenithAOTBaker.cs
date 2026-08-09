@@ -17,7 +17,7 @@ namespace PirexZenith.Editor
     {
         private const string GeneratedFilePath = "Assets/Pirex/Zenith/Generated/PirexZenithAOTGenerated.cs";
 
-        [MenuItem("Tools/PirexZenith/Bake AOT Code Generator")]
+        [MenuItem("Tools/UnityPrime/PirexZenith/Bake AOT Code Generator")]
         public static void BakeAOTCode()
         {
             Debug.Log("[PirexZenith AOT Baker] Starting AOT Code Generation scan...");

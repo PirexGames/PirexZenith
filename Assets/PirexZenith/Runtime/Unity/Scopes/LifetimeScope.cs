@@ -52,13 +52,6 @@ namespace PirexZenith
 
         private DIContainer _runtimeParentContainer;
 
-        // Cached lists for Pure C# Systems (Lifecycle EntryPoints)
-        private List<IInitializable> _initializables;
-        private List<ITickable> _tickables;
-        private List<IFixedTickable> _fixedTickables;
-        private List<ILateTickable> _lateTickables;
-        private List<IDisposable> _disposables;
-
         /// <summary>
         /// If true, this scope is automatically added to the global ActiveScopes list, making it eligible
         /// to become the parent of other scopes dynamically. Set to false for isolated scopes (e.g. UI Common Scopes) 
@@ -118,7 +111,6 @@ namespace PirexZenith
             builder.RegisterInstance<LifetimeScope>(this);
 
             Container = builder.Build();
-            InitializeSystems();
         }
 
         /// <summary>
@@ -128,83 +120,6 @@ namespace PirexZenith
         protected virtual void Configure(ContainerBuilder builder)
         {
             // By default, it does nothing unless overridden.
-        }
-
-        /// <summary>
-        /// Initializes and links registered Pure C# Systems implementing lifecycle interfaces.
-        /// </summary>
-        protected virtual void InitializeSystems()
-        {
-            if (Container == null) return;
-
-            _initializables = Container.ResolveAll<IInitializable>();
-            _tickables = Container.ResolveAll<ITickable>();
-            _fixedTickables = Container.ResolveAll<IFixedTickable>();
-            _lateTickables = Container.ResolveAll<ILateTickable>();
-            _disposables = Container.ResolveAll<IDisposable>();
-
-            if (_initializables != null && _initializables.Count > 0)
-            {
-                for (int i = 0; i < _initializables.Count; i++)
-                {
-                    try
-                    {
-                        _initializables[i]?.Initialize();
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.LogError($"[PirexZenith] Error while calling Initialize() on Pure C# System '{_initializables[i]?.GetType().Name}': {ex}");
-                    }
-                }
-            }
-        }
-
-        protected virtual void Update()
-        {
-            if (_tickables == null || _tickables.Count == 0) return;
-            for (int i = 0; i < _tickables.Count; i++)
-            {
-                try
-                {
-                    _tickables[i]?.Tick();
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogError($"[PirexZenith] Error while calling Tick() on Pure C# System '{_tickables[i]?.GetType().Name}': {ex}");
-                }
-            }
-        }
-
-        protected virtual void FixedUpdate()
-        {
-            if (_fixedTickables == null || _fixedTickables.Count == 0) return;
-            for (int i = 0; i < _fixedTickables.Count; i++)
-            {
-                try
-                {
-                    _fixedTickables[i]?.FixedTick();
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogError($"[PirexZenith] Error while calling FixedTick() on Pure C# System '{_fixedTickables[i]?.GetType().Name}': {ex}");
-                }
-            }
-        }
-
-        protected virtual void LateUpdate()
-        {
-            if (_lateTickables == null || _lateTickables.Count == 0) return;
-            for (int i = 0; i < _lateTickables.Count; i++)
-            {
-                try
-                {
-                    _lateTickables[i]?.LateTick();
-                }
-                catch (Exception ex)
-                {
-                    Debug.LogError($"[PirexZenith] Error while calling LateTick() on Pure C# System '{_lateTickables[i]?.GetType().Name}': {ex}");
-                }
-            }
         }
 
         /// <summary>
@@ -331,22 +246,6 @@ namespace PirexZenith
         protected virtual void OnDestroy()
         {
             ActiveScopes.Remove(this);
-
-            if (_disposables != null)
-            {
-                for (int i = _disposables.Count - 1; i >= 0; i--)
-                {
-                    try
-                    {
-                        _disposables[i]?.Dispose();
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.LogError($"[PirexZenith] Error while calling Dispose() on Pure C# System '{_disposables[i]?.GetType().Name}': {ex}");
-                    }
-                }
-                _disposables.Clear();
-            }
 
             Container?.Dispose();
             Container = null;
