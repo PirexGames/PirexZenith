@@ -1,5 +1,5 @@
 ﻿#if PIREX_REXPOOL_ENABLED
-using PirexGames.RexPool;
+using UnityPrime;
 #endif
 using UnityEngine;
 
